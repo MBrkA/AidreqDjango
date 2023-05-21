@@ -2,6 +2,14 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from front.forms import *
+from front.socket import DjangoSocket
+
+import threading
+
+mutex = threading.Lock()
+cond = threading.Condition(mutex)
+socket = DjangoSocket()
+socket.start()
 
 # Create your views here.
 
@@ -22,15 +30,34 @@ def login_post(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            request.session["token"] = "sadssaadsa"
-            return redirect('/home')
+            print("form is valid")
+            with socket.cond:
+                login_txt = "login " + form.cleaned_data['username'] + " " + form.cleaned_data['password']
+                print(login_txt)
+                socket.send_q.put(login_txt)
+                print("waiting for response")
+                if not socket.recv_q.empty():
+                    print("response received")
+                    socket.cond.wait()
+                received = socket.recv_q.get()
+                if "Login successful." in received:
+                    request.session["token"] = received.split(" ")[-1]
+                    return redirect('/home')
+                else:
+                    return redirect('/',{"error": "Invalid username or password"})
         else:
             return redirect('/')
     else:
         return redirect('/')
     
 def logout(request):
-    del request.session["token"]
+    with socket.cond:
+        socket.send_q.put("logout " + request.session["token"])
+        if not socket.recv_q.empty():
+            socket.cond.wait()
+        received = socket.recv_q.get()
+        if "Logout successful" in received:
+            del request.session["token"]
     return redirect('/')
 
 #################################
@@ -113,6 +140,21 @@ def arrived(request):
 
 ## ITEMS POST PAGES
 def search_item_post(request):
+    if request.method == 'POST':
+        form = SearchItemForm(request.POST)
+        if form.is_valid():
+            with socket.cond:
+                search_txt = "search_item " + form.cleaned_data['name']
+                socket.send_q.put(search_txt)
+                if not socket.recv_q.empty():
+                    socket.cond.wait()
+                received = socket.recv_q.get()
+                if "Item does not exist" in received:
+                    return HttpResponse("Item not found")
+                else:
+                    return HttpResponse(received)
+        else:
+            return redirect('/')
     return redirect('/home')
 def get_all_items_post(request):
     return redirect('/home')
