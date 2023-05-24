@@ -7,22 +7,35 @@
         <ul>
             <li><a href="/logout">Logout</a></li>
         </ul>
+        <h1>Campaign</h1>
+        Campaign: {{campaign}}<br>
+        <ul>
+            <li><a href="/create_campaign">New Campaign</a></li>
+            <li><a href="/list_campaigns">List Campaigns</a></li>
+            {% if not campaign %}
+            <li><a href="/open_campaign">Open Campaign</a></li>
+            {% else %}
+            <li><a href="/close_campaign">Close Campaign</a></li>
+            {% endif %}
+        </ul>
         <h1>Items</h1>
         <ul>
             <li><a href="/search_item">Search Item</a></li>
-            <li><a href="/get_all_items">Get All Items</a></li>
+            <li><a href="#">Get All Items</a></li>
             <li><a href="/update_item">Update Item</a></li>
             <li><a href="/delete_item">Delete Item</a></li>
         </ul>
-        <h1>Campaign</h1>
+        {% if campaign %}
+        <h1>Campaign Operations</h1>
         <ul>
-            <li><a href="/create_campaign">Create Campaign</a></li>
             <li><a href="/add_request">Add Request</a></li>
             <li><a href="/get_request">Get Request</a></li>
             <li><a href="/update_request">Update Request</a></li>
             <li><a href="/remove_request">Remove Request</a></li>
-            <li><a href="/query">Query</a></li>
-            <li><a href="/watch">Watch</a></li>
+            <li><a href="/query_rect">Query(Rectangular)</a></li>
+            <li><a href="/query_circle">Query(Circular)</a></li>
+            <li><a href="/watch_rect">Watch(Rectangular)</a></li>
+            <li><a href="/watch_circle">Watch(Circular)</a></li>
             <li><a href="/unwatch">Unwatch</a></li>
         </ul>
         <h1>Request</h1>
@@ -31,5 +44,6 @@
             <li><a href="/pick">Pick</a></li>
             <li><a href="/arrived">Arrived</a></li>
         </ul>
+        {% endif %}
     </body>
 </html>

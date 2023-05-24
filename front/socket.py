@@ -17,10 +17,12 @@ def get_response(client_socket,recv_q, condition):
             response = response.replace("##EOF##", "")
         resp = re.search("##EOF##", response)
         if response:
+            print("THREAD: response received")
             recv_q.put(response)
             #condition.notifyAll()
         if eof_check:
-            break
+            #break
+            continue
 
 class DjangoSocket:
     HOST = "127.0.0.1"
