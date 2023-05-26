@@ -57,18 +57,11 @@ class DjangoSocket:
     def stop(self):
         global stop_thread
         stop_thread = True
-        print("THREAD: stopping threads")
         self.in_thread.join()
-        print("THREAD: in_thread joined")
-        #self.out_thread.join()
-        print("THREAD: out_thread joined")
+        self.out_thread.join()
         self.client_socket.close()
-        print("THREAD: socket closed")
         stop_thread = False
 
-
-        ## TODO
-        ## STOP_THREAD HERKESİ ÖLDÜREBİLİR
 
 def socket_service(msg, socket):
     print("socket_service")
