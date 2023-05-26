@@ -4,7 +4,7 @@ import threading
 import re
 
 stop_thread = False
-
+watches = []
 
 def get_input(client_socket,send_q):
     global stop_thread
@@ -22,9 +22,14 @@ def get_response(client_socket,recv_q, condition):
         response = client_socket.recv(1024).decode()
         #client_socket.settimeout(None)
         eof_check = True if response.find("##EOF##") != -1 else False
+        watch_check = True if response.find("WATCH MATCHED") != -1 else False
         if eof_check:
             response = response.replace("##EOF##", "")
         resp = re.search("##EOF##", response)
+        if watch_check:
+            global watches
+            watches.append({'token': response.split()[-1], 'response': response})
+            continue
         if response:
             print("THREAD: response received")
             recv_q.put(response)
@@ -90,3 +95,11 @@ def usersocket_service(msg,socket):
         socket.send_q.put(msg)
         received = socket.recv_q.get()
     return received
+
+def get_watches(token):
+    global watches
+    result = []
+    for watch in watches:
+        if watch['token'] == token:
+            result.append(watch['response'])
+    return result

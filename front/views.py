@@ -2,13 +2,9 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from front.forms import *
-from front.socket import DjangoSocket, socket_service, usersocket_service
+from front.socket import DjangoSocket, socket_service, usersocket_service, get_watches
 
 import threading
-
-# list of {'token': token, 'socket': socket}
-users = []
-
 
 test_socket = DjangoSocket()
 test_socket.start()
@@ -18,7 +14,9 @@ test_socket.start()
 def main(request):
     if request.session.get('token', False):
         campaign = request.session.get("campaign", False)
-        return redirect('/home', {'campaign': campaign})
+        username = request.session.get("username", "")
+        watches = get_watches(request.session.get('token'))
+        return redirect('/home', {'campaign': campaign, 'username': username, 'watches': watches})
 
     form = LoginForm()
     return redirect('/login', {'form': form})
@@ -28,7 +26,9 @@ def home(request):
         campaign = request.session.get("campaign", False)
         return redirect('/login')
     campaign = request.session.get("campaign", False)
-    return render(request, 'home.html', {'campaign': campaign})
+    username = request.session.get("username", "")
+    watches = get_watches(request.session.get('token'))
+    return render(request, 'home.html', {'campaign': campaign, 'username': username, 'watches': watches})
 
 def login(request):
     if request.session.get('token', False):
@@ -56,8 +56,8 @@ def login_post(request):
         received = socket_service(login_txt, test_socket)
         if "Login successful" in received:
             request.session['token'] = received.split(" ")[3]
-            users.append({'token': request.session['token'], 'socket': None})
-            return redirect('/home', {'campaign': False})
+            request.session['username'] = form.cleaned_data["username"]
+            return redirect('/home', {'campaign': False, 'username': form.cleaned_data["username"]})
         else:
             return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
     else:
@@ -79,7 +79,7 @@ def create_campaign(request):
 def list_campaigns(request):
     if not request.session.get('token', False):
         return redirect('/login')
-    received = socket_service(f"{request.session.get('token')} list")
+    received = socket_service(f"{request.session.get('token')} list", test_socket)
     if "##EOF##" in received:
         received = received.replace("##EOF##", "")
     campaigns = received.split("\t")
@@ -138,7 +138,7 @@ def add_request(request):
 def get_all_requests(request):
     if not request.session.get('token', False):
         return redirect('/login')
-    received = socket_service(f"{request.session.get('token')} get_all_requests")
+    received = socket_service(f"{request.session.get('token')} get_all_requests", test_socket)
     requests = received.split("\n")
     return render(request, 'result.html', {'result': requests, 'title': 'All Requests In Campaign'})
 
