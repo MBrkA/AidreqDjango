@@ -28,18 +28,19 @@ def home(request):
     campaign = request.session.get("campaign", False)
     username = request.session.get("username", "")
     watches = get_watches(request.session.get('token'))
+    if watches == []:
+        watches = ""
     return render(request, 'home.html', {'campaign': campaign, 'username': username, 'watches': watches})
 
 def login(request):
     if request.session.get('token', False):
         return redirect('/home')
-    form = LoginForm(request.GET)
-    return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
+    form = LoginForm()
+    return render(request, 'login.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
 
 
 def logout(request):
     received = socket_service(f"{request.session.get('token')} logout", test_socket)
-    #received = socket_service(f"{request.session.get('token')} logout")
     if "Logout successful" in received:
         request.session.flush()
     return redirect('/')
@@ -296,6 +297,7 @@ def open_campaign_post(request):
 
 def add_request_post(request):
     if request.method == 'POST':
+        print(request.POST)
         form = AddRequestForm(request.POST)
         if form.is_valid():
             '''
