@@ -48,7 +48,6 @@ urlpatterns = [
     path('arrived/', views.arrived),
     ## API
     re_path('login_post/', views.login_post),
-    re_path('logout_post/', views.logout_post),
     re_path('search_item_post/', views.search_item_post),
     re_path('get_all_items_post/', views.get_all_items_post),
     re_path('update_item_post/', views.update_item_post),

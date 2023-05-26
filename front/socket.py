@@ -5,22 +5,15 @@ import re
 
 stop_thread = False
 
-def socket_service(msg):
-    received = ""
-    socket = DjangoSocket()
-    socket.start()
-    with socket.cond:
-        socket.send_q.put(msg)
-        received = socket.recv_q.get()
-    socket.stop()
-    return received
 
 def get_input(client_socket,send_q):
     global stop_thread
     while True:
         if stop_thread:
+            print("SENDER: stopping thread")
             break
         if not send_q.empty():
+            print("SENDER: sending request")
             client_socket.sendall(send_q.get().encode())
 
 def get_response(client_socket,recv_q, condition):
@@ -39,6 +32,14 @@ def get_response(client_socket,recv_q, condition):
         if eof_check:
             #break
             continue
+
+def SocketTest(msg):
+    HOST = "127.0.0.1"
+    PORT = 1423
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((SocketTest.HOST, SocketTest.PORT))
+
 
 class DjangoSocket:
     HOST = "127.0.0.1"
@@ -74,3 +75,18 @@ class DjangoSocket:
 
         ## TODO
         ## STOP_THREAD HERKESİ ÖLDÜREBİLİR
+
+def socket_service(msg, socket):
+    print("socket_service")
+    received = ""
+    with socket.cond:
+        socket.send_q.put(msg)
+        received = socket.recv_q.get()
+    return received
+
+def usersocket_service(msg,socket):
+    received = ""
+    with socket.cond:
+        socket.send_q.put(msg)
+        received = socket.recv_q.get()
+    return received
