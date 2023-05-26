@@ -3,15 +3,31 @@ import socket
 import threading
 import re
 
+stop_thread = False
+
+def socket_service(msg):
+    received = ""
+    socket = DjangoSocket()
+    socket.start()
+    with socket.cond:
+        socket.send_q.put(msg)
+        received = socket.recv_q.get()
+    socket.stop()
+    return received
 
 def get_input(client_socket,send_q):
+    global stop_thread
     while True:
+        if stop_thread:
+            break
         if not send_q.empty():
             client_socket.sendall(send_q.get().encode())
 
 def get_response(client_socket,recv_q, condition):
     while True:
+        #client_socket.settimeout(100)
         response = client_socket.recv(1024).decode()
+        #client_socket.settimeout(None)
         eof_check = True if response.find("##EOF##") != -1 else False
         if eof_check:
             response = response.replace("##EOF##", "")
@@ -44,6 +60,17 @@ class DjangoSocket:
         self.out_thread.start()
 
     def stop(self):
+        global stop_thread
+        stop_thread = True
+        print("THREAD: stopping threads")
         self.in_thread.join()
-        self.out_thread.join()
+        print("THREAD: in_thread joined")
+        #self.out_thread.join()
+        print("THREAD: out_thread joined")
         self.client_socket.close()
+        print("THREAD: socket closed")
+        stop_thread = False
+
+
+        ## TODO
+        ## STOP_THREAD HERKESİ ÖLDÜREBİLİR

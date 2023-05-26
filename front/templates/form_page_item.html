@@ -1,0 +1,43 @@
+<html lang="en">
+    <head><meta charset="utf-8">
+        <title>Form</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    </head>
+    <body>
+        <nav class="navbar navbar-light" style="background-color: powderblue;">
+            <a class="navbar-brand"  href="/">Home</a>
+            <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
+        </nav>
+        <h1>{{title}}</h1>
+        <form method="post" action="/{{action}}/" id="form">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="number" name="item_count" id="item_count" value="0" hidden>
+            <input type="button" value="Add Item" onclick="add_item()" id="submitBtn" />
+            <input id="submitBtn" type="submit" value="Send" />
+        </form>
+        <br>
+    </body>
+</html>
+
+<script>
+item_count = 0;
+function add_item() {
+    item_count++;
+    var item = document.createElement("input");
+    item.setAttribute("type", "text");
+    item.setAttribute("name", "item" + item_count);
+    item.setAttribute("id", "item" + item_count);
+    item.setAttribute("placeholder", "Item " + item_count);
+    var amount = document.createElement("input");
+    amount.setAttribute("type", "number");
+    amount.setAttribute("name", "amount" + item_count);
+    amount.setAttribute("id", "amount" + item_count);
+    amount.setAttribute("placeholder", "Amount " + item_count);
+    document.getElementById("submitBtn").before(item)
+    document.getElementById("submitBtn").before(amount)
+    document.getElementById("submitBtn").before(document.createElement("br"))
+    document.getElementById("item_count").setAttribute("value", item_count);
+}
+add_item();
+</script>

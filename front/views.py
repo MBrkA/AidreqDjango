@@ -2,20 +2,18 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from front.forms import *
-from front.socket import DjangoSocket
+from front.socket import DjangoSocket, socket_service
 
 import threading
 
 mutex = threading.Lock()
 cond = threading.Condition(mutex)
-socket = DjangoSocket()
-socket.start()
 
 # Create your views here.
 
 
 def main(request):
-    if request.session.get("token", False):
+    if request.session.get('token', False):
         campaign = request.session.get("campaign", False)
         return redirect('/home', {'campaign': campaign})
 
@@ -24,7 +22,7 @@ def main(request):
 
 
 def home(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         campaign = request.session.get("campaign", False)
         return redirect('/login')
     campaign = request.session.get("campaign", False)
@@ -34,12 +32,10 @@ def home(request):
 def login_post(request):
     form = LoginForm(request.POST)
     if form.is_valid():
-        with socket.cond:
-            socket.send_q.put("login " + form.cleaned_data["username"] + " " + form.cleaned_data["password"])
-            received = socket.recv_q.get()
+        received = socket_service("login " + form.cleaned_data["username"] + " " + form.cleaned_data["password"])
         if "Login successful" in received:
-            request.session["token"] = received.split(" ")[2]
-            campaign = request.session.get("campaign", False)
+            request.session['token'] = received.split(" ")[3]
+            campaign = request.session.get("campaign", "None")
             return redirect('/home', {'campaign': campaign})
         else:
             return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
@@ -48,26 +44,24 @@ def login_post(request):
 
 
 def login(request):
+    if request.session.get('token', False):
+        return redirect('/home')
     form = LoginForm(request.GET)
     return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
 
 
 def logout(request):
-    with socket.cond:
-        socket.send_q.put("logout")
-        received = socket.recv_q.get()
+    received = socket_service(f"{request.session.get('token')} logout")
     if "Logout successful" in received:
         request.session.flush()
-    return redirect('/login')
+    return redirect('/')
 
 
 def logout_post(request):
-    with socket.cond:
-        socket.send_q.put("logout")
-        received = socket.recv_q.get()
+    received = socket_service("logout")
     if "Logout successful" in received:
         request.session.flush()
-    return redirect('/login')
+    return redirect('/')
 
 #################################
 #  FORM PAGES
@@ -76,18 +70,16 @@ def logout_post(request):
 
 # CAMPAIGN FORM PAGES
 def create_campaign(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = CreateCampaignForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Create Campaign', 'action': 'create_campaign_post'})
 
 
 def list_campaigns(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
-    with socket.cond:
-        socket.send_q.put("list")
-        received = socket.recv_q.get()
+    received = socket_service(f"{request.session.get('token')} list")
     if "##EOF##" in received:
         received = received.replace("##EOF##", "")
     campaigns = received.split("\t")
@@ -95,43 +87,41 @@ def list_campaigns(request):
 
 
 def open_campaign(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = OpenCampaignForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Open Campaign', 'action': 'open_campaign_post'})
 
 
 def close_campaign(request):
-    create_txt = "close"
-    with socket.cond:
-        socket.send_q.put(create_txt)
-        received = socket.recv_q.get()
+    create_txt = request.session.get('token') + " close"
+    received = socket_service(create_txt)
     del request.session["campaign"]
     return render(request, 'result.html', {'result': received})
 
 
 # ITEMS FORM PAGES
 def search_item(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = SearchItemForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Search Item', 'action': 'search_item_post'})
 
 
 def get_all_items(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
 
 
 def update_item(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = UpdateItemForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Update Item', 'action': 'update_item_post'})
 
 
 def delete_item(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = RemoveItemForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Delete Item', 'action': 'delete_item_post'})
@@ -139,73 +129,71 @@ def delete_item(request):
 
 # CAMPAIGN OPERATIONS FORM PAGES
 def add_request(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = AddRequestForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Add Request', 'action': 'add_request_post'})
+    return render(request, 'form_page_item.html', {'form': form, 'title': 'Add Request', 'action': 'add_request_post'})
 
 
 def get_all_requests(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
-    with socket.cond:
-        socket.send_q.put("get_all_requests")
-        received = socket.recv_q.get()
+    received = socket_service(f"{request.session.get('token')} get_all_requests")
     requests = received.split("\n")
     return render(request, 'result.html', {'result': requests, 'title': 'All Requests In Campaign'})
 
 
 def get_request(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = GetRequestForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Get Request', 'action': 'get_request_post'})
 
 
 def update_request(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = UpdateRequestForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Update Request', 'action': 'update_request_post'})
 
 
 def remove_request(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = RemoveRequestForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Remove Request', 'action': 'remove_request_post'})
 
 
 def query_rect(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = QueryRectForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Query Rect', 'action': 'query_rect_post'})
 
 
 def query_circle(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = QueryCircleForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Query Circle', 'action': 'query_circle_post'})
 
 
 def watch_rect(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = WatchRectForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Watch Rect', 'action': 'watch_rect_post'})
 
 
 def watch_circle(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = WatchCircleForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Watch Circle', 'action': 'watch_circle_post'})
 
 
 def unwatch(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = UnwatchForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Unwatch', 'action': 'unwatch_post'})
@@ -213,21 +201,21 @@ def unwatch(request):
 
 # REQUEST FORM PAGES
 def mark_available(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = MarkAvailableForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post'})
 
 
 def pick(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = PickForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Pick', 'action': 'pick_post'})
 
 
 def arrived(request):
-    if not request.session.get("token", False):
+    if not request.session.get('token', False):
         return redirect('/login')
     form = ArrivedForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Arrived', 'action': 'arrived_post'})
@@ -241,10 +229,8 @@ def search_item_post(request):
     if request.method == 'POST':
         form = SearchItemForm(request.POST)
         if form.is_valid():
-            search_txt = "search_item " + form.cleaned_data['name']
-            with socket.cond:
-                socket.send_q.put(search_txt)
-                received = socket.recv_q.get()
+            search_txt = request.session.get('token') + " search_item " + form.cleaned_data['name']
+            received = socket_service(search_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -259,10 +245,8 @@ def update_item_post(request):
     if request.method == 'POST':
         form = UpdateItemForm(request.POST)
         if form.is_valid():
-            update_txt = f"update_item {form.cleaned_data['target']} {form.cleaned_data['name']} {form.cleaned_data['synonyms']}"
-            with socket.cond:
-                socket.send_q.put(update_txt)
-                received = socket.recv_q.get()
+            update_txt = f"{request.session.get('token')} update_item {form.cleaned_data['target']} {form.cleaned_data['name']} {form.cleaned_data['synonyms']}"
+            received = socket_service(update_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -273,10 +257,8 @@ def delete_item_post(request):
     if request.method == 'POST':
         form = RemoveItemForm(request.POST)
         if form.is_valid():
-            delete_txt = "remove_item " + form.cleaned_data['name']
-            with socket.cond:
-                socket.send_q.put(delete_txt)
-                received = socket.recv_q.get()
+            delete_txt = request.session.get('token') + " remove_item " + form.cleaned_data['name']
+            received = socket_service(delete_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -288,10 +270,8 @@ def create_campaign_post(request):
     if request.method == 'POST':
         form = CreateCampaignForm(request.POST)
         if form.is_valid():
-            create_txt = f"new {form.cleaned_data['name']} {form.cleaned_data['description']}"
-            with socket.cond:
-                socket.send_q.put(create_txt)
-                received = socket.recv_q.get()
+            create_txt = f"{request.session.get('token')} new {form.cleaned_data['name']} {form.cleaned_data['description']}"
+            received = socket_service(create_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -303,11 +283,10 @@ def open_campaign_post(request):
     if request.method == 'POST':
         form = OpenCampaignForm(request.POST)
         if form.is_valid():
-            open_txt = "open " + form.cleaned_data['name']
-            with socket.cond:
-                socket.send_q.put(open_txt)
-                received = socket.recv_q.get()
-            request.session["campaign"] = form.cleaned_data['name']
+            open_txt = request.session.get('token') + " open " + form.cleaned_data['name']
+            received = socket_service(open_txt)
+            if "Campaign opened" in received:
+                request.session["campaign"] = form.cleaned_data['name']
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -319,10 +298,11 @@ def add_request_post(request):
     if request.method == 'POST':
         form = AddRequestForm(request.POST)
         if form.is_valid():
-            add_txt = f"add_request {form.cleaned_data['item']} {form.cleaned_data['amount']} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
-            with socket.cond:
-                socket.send_q.put(add_txt)
-                received = socket.recv_q.get()
+            item = ""
+            for i in enumerate(form.cleaned_data[item_count]):
+                item += form.cleaned_data[f"item{i+1}"] + " " + form.cleaned_data[f"amount{i+1}"] + " "
+            add_txt = f"{request.session.get('token')} add_request {item} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
+            received = socket_service(add_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -333,10 +313,8 @@ def get_request_post(request):
     if request.method == 'POST':
         form = GetRequestForm(request.POST)
         if form.is_valid():
-            get_txt = "get_request " + form.cleaned_data['request']
-            with socket.cond:
-                socket.send_q.put(get_txt)
-                received = socket.recv_q.get()
+            get_txt = request.session.get('token') + " get_request " + form.cleaned_data['request']
+            received = socket_service(get_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -347,10 +325,8 @@ def update_request_post(request):
     if request.method == 'POST':
         form = UpdateRequestForm(request.POST)
         if form.is_valid():
-            update_txt = f"update_request {form.cleaned_data['request']} {form.cleaned_data['item']} {form.cleaned_data['amount']} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
-            with socket.cond:
-                socket.send_q.put(update_txt)
-                received = socket.recv_q.get()
+            update_txt = f"{request.session.get('token')} update_request {form.cleaned_data['request']} {form.cleaned_data['item']} {form.cleaned_data['amount']} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
+            received = socket_service(update_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -361,10 +337,8 @@ def remove_request_post(request):
     if request.method == 'POST':
         form = RemoveRequestForm(request.POST)
         if form.is_valid():
-            remove_txt = "remove_request " + form.cleaned_data['request']
-            with socket.cond:
-                socket.send_q.put(remove_txt)
-                received = socket.recv_q.get()
+            remove_txt = request.session.get('token') + " remove_request " + form.cleaned_data['request']
+            received = socket_service(remove_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -375,10 +349,8 @@ def query_rect_post(request):
     if request.method == 'POST':
         form = QueryRectForm(request.POST)
         if form.is_valid():
-            query_txt = f"query {form.cleaned_data['item']} 0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
-            with socket.cond:
-                socket.send_q.put(query_txt)
-                received = socket.recv_q.get()
+            query_txt = f"{request.session.get('token')} query {form.cleaned_data['item']} 0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
+            received = socket_service(query_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -389,10 +361,8 @@ def query_circle_post(request):
     if request.method == 'POST':
         form = QueryCircleForm(request.POST)
         if form.is_valid():
-            query_txt = f"query {form.cleaned_data['item']} 1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
-            with socket.cond:
-                socket.send_q.put(query_txt)
-                received = socket.recv_q.get()
+            query_txt = f"{request.session.get('token')} query {form.cleaned_data['item']} 1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
+            received = socket_service(query_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -403,10 +373,8 @@ def watch_rect_post(request):
     if request.method == 'POST':
         form = WatchRectForm(request.POST)
         if form.is_valid():
-            watch_txt = f"watch {form.cleaned_data['item']} 0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
-            with socket.cond:
-                socket.send_q.put(watch_txt)
-                received = socket.recv_q.get()
+            watch_txt = f"{request.session.get('token')} watch {form.cleaned_data['item']} 0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
+            received = socket_service(watch_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -417,10 +385,8 @@ def watch_circle_post(request):
     if request.method == 'POST':
         form = WatchCircleForm(request.POST)
         if form.is_valid():
-            watch_txt = f"watch {form.cleaned_data['item']} 1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
-            with socket.cond:
-                socket.send_q.put(watch_txt)
-                received = socket.recv_q.get()
+            watch_txt = f"{request.session.get('token')} watch {form.cleaned_data['item']} 1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
+            received = socket_service(watch_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -431,10 +397,8 @@ def unwatch_post(request):
     if request.method == 'POST':
         form = UnwatchForm(request.POST)
         if form.is_valid():
-            unwatch_txt = "unwatch " + form.cleaned_data['watch']
-            with socket.cond:
-                socket.send_q.put(unwatch_txt)
-                received = socket.recv_q.get()
+            unwatch_txt = request.session.get('token') + " unwatch " + form.cleaned_data['watch']
+            received = socket_service(unwatch_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -446,10 +410,8 @@ def mark_available_post(request):
     if request.method == 'POST':
         form = MarkAvailableForm(request.POST)
         if form.is_valid():
-            mark_txt = f"mark_available {form.cleaned_data['request']} {form.cleaned_data['item']} {form.cleaned_data['amount']} {form.cleaned_data['expire']} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['comment']}"
-            with socket.cond:
-                socket.send_q.put(mark_txt)
-                received = socket.recv_q.get()
+            mark_txt = f"{request.session.get('token')} mark_available {form.cleaned_data['request']} {form.cleaned_data['item']} {form.cleaned_data['amount']} {form.cleaned_data['expire']} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['comment']}"
+            received = socket_service(mark_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -460,10 +422,8 @@ def pick_post(request):
     if request.method == 'POST':
         form = PickForm(request.POST)
         if form.is_valid():
-            pick_txt = f"pick {form.cleaned_data['request']} {form.cleaned_data['markavailable']} {form.cleaned_data['item']} {form.cleaned_data['amount']}"
-            with socket.cond:
-                socket.send_q.put(pick_txt)
-                received = socket.recv_q.get()
+            pick_txt = f"{request.session.get('token')} pick {form.cleaned_data['request']} {form.cleaned_data['markavailable']} {form.cleaned_data['item']} {form.cleaned_data['amount']}"
+            received = socket_service(pick_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -474,10 +434,8 @@ def arrived_post(request):
     if request.method == 'POST':
         form = ArrivedForm(request.POST)
         if form.is_valid():
-            arrived_txt = f"arrived {form.cleaned_data['request']} {form.cleaned_data['markavailable']}"
-            with socket.cond:
-                socket.send_q.put(arrived_txt)
-                received = socket.recv_q.get()
+            arrived_txt = f"{request.session.get('token')} arrived {form.cleaned_data['request']} {form.cleaned_data['markavailable']}"
+            received = socket_service(arrived_txt)
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
