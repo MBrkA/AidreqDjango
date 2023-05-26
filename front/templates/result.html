@@ -9,14 +9,7 @@
             <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
         </nav>
         <h1>Result</h1>
-        {% if title == "All Requests In Campaign" %}
-            {% for request in result %}
-                {{ request }}
-                <br>
-            {% endfor %}
-        {% else %}
         {{ result }}
-        {% endif %}
         <br>
         <button onclick="window.location.href='/home'">Home</button>
     </body>

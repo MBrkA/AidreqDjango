@@ -18,9 +18,7 @@ def get_input(client_socket,send_q):
 
 def get_response(client_socket,recv_q, condition):
     while True:
-        #client_socket.settimeout(100)
         response = client_socket.recv(1024).decode()
-        #client_socket.settimeout(None)
         eof_check = True if response.find("##EOF##") != -1 else False
         watch_check = True if response.find("WATCH MATCHED") != -1 else False
         if eof_check:
@@ -33,17 +31,8 @@ def get_response(client_socket,recv_q, condition):
         if response:
             print("THREAD: response received")
             recv_q.put(response)
-            #condition.notifyAll()
         if eof_check:
-            #break
             continue
-
-def SocketTest(msg):
-    HOST = "127.0.0.1"
-    PORT = 1423
-
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((SocketTest.HOST, SocketTest.PORT))
 
 
 class DjangoSocket:
@@ -83,13 +72,6 @@ class DjangoSocket:
 
 def socket_service(msg, socket):
     print("socket_service")
-    received = ""
-    with socket.cond:
-        socket.send_q.put(msg)
-        received = socket.recv_q.get()
-    return received
-
-def usersocket_service(msg,socket):
     received = ""
     with socket.cond:
         socket.send_q.put(msg)

@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from front.forms import *
-from front.socket import DjangoSocket, socket_service, usersocket_service, get_watches
+from front.socket import DjangoSocket, socket_service, get_watches
 
 import threading
 
@@ -46,7 +46,7 @@ def logout(request):
     return redirect('/')
 
 #################################
-#  LOGIN POST
+#  LOGIN POST 
 #################################
 
 def login_post(request):
@@ -109,11 +109,6 @@ def search_item(request):
     return render(request, 'form_page.html', {'form': form, 'title': 'Search Item', 'action': 'search_item_post'})
 
 
-def get_all_items(request):
-    if not request.session.get('token', False):
-        return redirect('/login')
-
-
 def update_item(request):
     if not request.session.get('token', False):
         return redirect('/login')
@@ -133,7 +128,7 @@ def add_request(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = AddRequestForm()
-    return render(request, 'form_page_item.html', {'form': form, 'title': 'Add Request', 'action': 'add_request_post'})
+    return render(request, 'form_page_itemreq.html', {'form': form, 'title': 'Add Request', 'action': 'add_request_post'})
 
 
 def get_all_requests(request):
@@ -155,7 +150,7 @@ def update_request(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = UpdateRequestForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Update Request', 'action': 'update_request_post'})
+    return render(request, 'form_page_itemreq.html', {'form': form, 'title': 'Update Request', 'action': 'update_request_post'})
 
 
 def remove_request(request):
@@ -169,28 +164,28 @@ def query_rect(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = QueryRectForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Query Rect', 'action': 'query_rect_post'})
+    return render(request, 'form_page_item.html', {'form': form, 'title': 'Query Rect', 'action': 'query_rect_post'})
 
 
 def query_circle(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = QueryCircleForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Query Circle', 'action': 'query_circle_post'})
+    return render(request, 'form_page_item.html', {'form': form, 'title': 'Query Circle', 'action': 'query_circle_post'})
 
 
 def watch_rect(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = WatchRectForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Watch Rect', 'action': 'watch_rect_post'})
+    return render(request, 'form_page_item.html', {'form': form, 'title': 'Watch Rect', 'action': 'watch_rect_post'})
 
 
 def watch_circle(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = WatchCircleForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Watch Circle', 'action': 'watch_circle_post'})
+    return render(request, 'form_page_item.html', {'form': form, 'title': 'Watch Circle', 'action': 'watch_circle_post'})
 
 
 def unwatch(request):
@@ -236,11 +231,6 @@ def search_item_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
-
-
-def get_all_items_post(request):
-    return render(request, 'result.html', {'result': "Invalid request"})
-
 
 def update_item_post(request):
     if request.method == 'POST':
@@ -297,15 +287,14 @@ def open_campaign_post(request):
 
 def add_request_post(request):
     if request.method == 'POST':
-        print(request.POST)
+        data = request.POST.dict()
         form = AddRequestForm(request.POST)
         if form.is_valid():
-            '''
-            item = ""
-            for i in enumerate(form.cleaned_data[item_count]):
-                item += form.cleaned_data[f"item{i+1}"] + " " + form.cleaned_data[f"amount{i+1}"] + " "
-            '''    
-            add_txt = f"{request.session.get('token')} add_request {form.cleaned_data['item']} {form.cleaned_data['amount']} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
+            item = " "
+            for i in range(int(data['item_count'])):
+                item += data[f"item{i+1}"] + " " + data[f"amount{i+1}"] + " "
+
+            add_txt = f"{request.session.get('token')} add_request{item}{form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
             received = socket_service(add_txt, test_socket)
             return render(request, 'result.html', {'result': received})
         else:
@@ -327,9 +316,13 @@ def get_request_post(request):
 
 def update_request_post(request):
     if request.method == 'POST':
+        data = request.POST.dict()
         form = UpdateRequestForm(request.POST)
         if form.is_valid():
-            update_txt = f"{request.session.get('token')} update_request {form.cleaned_data['request']} {form.cleaned_data['item']} {form.cleaned_data['amount']} {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
+            item = " "
+            for i in range(int(data['item_count'])):
+                item += data[f"item{i+1}"] + " " + data[f"amount{i+1}"] + " "
+            update_txt = f"{request.session.get('token')} update_request {form.cleaned_data['request']}{item}{form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['urgency']} {form.cleaned_data['description']}"
             received = socket_service(update_txt, test_socket)
             return render(request, 'result.html', {'result': received})
         else:
@@ -351,9 +344,13 @@ def remove_request_post(request):
 
 def query_rect_post(request):
     if request.method == 'POST':
+        data = request.POST.dict()
         form = QueryRectForm(request.POST)
         if form.is_valid():
-            query_txt = f"{request.session.get('token')} query {form.cleaned_data['item']} 0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
+            item = " "
+            for i in range(int(data['item_count'])):
+                item += data[f"item{i+1}"] + " "
+            query_txt = f"{request.session.get('token')} query {data['item_count']}{item}0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
             received = socket_service(query_txt, test_socket)
             return render(request, 'result.html', {'result': received})
         else:
@@ -363,9 +360,13 @@ def query_rect_post(request):
 
 def query_circle_post(request):
     if request.method == 'POST':
+        data = request.POST.dict()
         form = QueryCircleForm(request.POST)
         if form.is_valid():
-            query_txt = f"{request.session.get('token')} query {form.cleaned_data['item']} 1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
+            item = " "
+            for i in range(int(data['item_count'])):
+                item += data[f"item{i+1}"] + " "
+            query_txt = f"{request.session.get('token')} query {data['item_count']}{item}1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
             received = socket_service(query_txt, test_socket)
             return render(request, 'result.html', {'result': received})
         else:
@@ -375,9 +376,13 @@ def query_circle_post(request):
 
 def watch_rect_post(request):
     if request.method == 'POST':
+        data = request.POST.dict()
         form = WatchRectForm(request.POST)
         if form.is_valid():
-            watch_txt = f"{request.session.get('token')} watch {form.cleaned_data['item']} 0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
+            item = " "
+            for i in range(int(data['item_count'])):
+                item += data[f"item{i+1}"] + " "
+            watch_txt = f"{request.session.get('token')} watch {data['item_count']}{item}0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
             received = socket_service(watch_txt, test_socket)
             return render(request, 'result.html', {'result': received})
         else:
@@ -387,9 +392,13 @@ def watch_rect_post(request):
 
 def watch_circle_post(request):
     if request.method == 'POST':
+        data = request.POST.dict()
         form = WatchCircleForm(request.POST)
         if form.is_valid():
-            watch_txt = f"{request.session.get('token')} watch {form.cleaned_data['item']} 1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
+            item = " "
+            for i in range(int(data['item_count'])):
+                item += data[f"item{i+1}"] + " "
+            watch_txt = f"{request.session.get('token')} watch {data['item_count']}{item}1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
             received = socket_service(watch_txt, test_socket)
             return render(request, 'result.html', {'result': received})
         else:

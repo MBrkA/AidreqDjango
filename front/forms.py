@@ -14,8 +14,8 @@ class SearchItemForm(forms.Form):
 
 class UpdateItemForm(forms.Form):
     target = forms.CharField(label='target', max_length=64, required=True)
-    name = forms.CharField(label='name', max_length=64, required=False)
-    synonyms = forms.CharField(widget=forms.Textarea, label='synonyms', required=False)
+    name = forms.CharField(label='name', max_length=64, required=True)
+    synonyms = forms.CharField(widget=forms.Textarea, label='synonyms', required=True)
 
 
 class RemoveItemForm(forms.Form):
@@ -25,7 +25,7 @@ class RemoveItemForm(forms.Form):
 # CAMPAIGN FORMS
 class CreateCampaignForm(forms.Form):
     name = forms.CharField(label='name', max_length=64, required=True)
-    description = forms.CharField(widget=forms.Textarea, label='description', required=False)
+    description = forms.CharField(widget=forms.Textarea, label='description', required=True)
 
 
 class OpenCampaignForm(forms.Form):
@@ -33,30 +33,26 @@ class OpenCampaignForm(forms.Form):
 
 
 class AddRequestForm(forms.Form):
-    item = forms.CharField(label='item', max_length=64, required=True)
-    amount = forms.IntegerField(label='quantity', required=True)
     latitude = forms.FloatField(label='latitude', required=True)
     longitude = forms.FloatField(label='longitude', required=True)
     urgency = forms.CharField(widget=forms.Select(choices=[('URGENT', 'URGENT'), ('SOON', 'SOON'), ('DAYS', 'DAYS'), ('WEEKS','WEEKS'), ('OPTIONAL','OPTIONAL')]), label='urgency', required=True)
-    description = forms.CharField(widget=forms.Textarea, label='description', required=False)
+    description = forms.CharField(widget=forms.Textarea, label='description', required=True)
 
 
 class GetAllRequestsForm(forms.Form):
     campaign = forms.CharField(label='campaign', max_length=64, required=True)
 
-
 class GetRequestForm(forms.Form):
-    request = forms.CharField(label='requestid', max_length=64, required=True)
-
+    request = forms.CharField(label='request', max_length=64, required=True)
 
 class UpdateRequestForm(forms.Form):
     request = forms.CharField(label='requestid', max_length=64, required=True)
-    item = forms.CharField(label='item', max_length=64, required=False)
-    amount = forms.IntegerField(label='quantity', required=False)
-    latitude = forms.FloatField(label='latitude', required=False)
-    longitude = forms.FloatField(label='longitude', required=False)
-    urgency = forms.CharField(widget=forms.Select(choices=[('URGENT', 'URGENT'), ('SOON', 'SOON'), ('DAYS', 'DAYS'), ('WEEKS','WEEKS'), ('OPTIONAL','OPTIONAL')]), label='urgency', required=False)
-    description = forms.CharField(widget=forms.Textarea, label='description', required=False)
+    item = forms.CharField(label='item', max_length=64, required=True)
+    amount = forms.IntegerField(label='quantity', required=True)
+    latitude = forms.FloatField(label='latitude', required=True)
+    longitude = forms.FloatField(label='longitude', required=True)
+    urgency = forms.CharField(widget=forms.Select(choices=[('URGENT', 'URGENT'), ('SOON', 'SOON'), ('DAYS', 'DAYS'), ('WEEKS','WEEKS'), ('OPTIONAL','OPTIONAL')]), label='urgency', required=True)
+    description = forms.CharField(widget=forms.Textarea, label='description', required=True)
 
 
 class RemoveRequestForm(forms.Form):
@@ -64,7 +60,6 @@ class RemoveRequestForm(forms.Form):
 
 
 class QueryRectForm(forms.Form):
-    item = forms.CharField(label='item', max_length=64, required=True)
     latitude1 = forms.FloatField(label='latitude1', required=True)
     longitude1 = forms.FloatField(label='longitude1', required=True)
     latitude2 = forms.FloatField(label='latitude2', required=True)
@@ -73,7 +68,6 @@ class QueryRectForm(forms.Form):
 
 
 class QueryCircleForm(forms.Form):
-    item = forms.CharField(label='item', max_length=64, required=True)
     latitude = forms.FloatField(label='latitude', required=True)
     longitude = forms.FloatField(label='longitude', required=True)
     radius = forms.FloatField(label='radius', required=True)
@@ -81,7 +75,6 @@ class QueryCircleForm(forms.Form):
 
 
 class WatchRectForm(forms.Form):
-    item = forms.CharField(label='item', max_length=64, required=True)
     latitude1 = forms.FloatField(label='latitude1', required=True)
     longitude1 = forms.FloatField(label='longitude1', required=True)
     latitude2 = forms.FloatField(label='latitude2', required=True)
@@ -90,7 +83,6 @@ class WatchRectForm(forms.Form):
 
 
 class WatchCircleForm(forms.Form):
-    item = forms.CharField(label='item', max_length=64, required=True)
     latitude = forms.FloatField(label='latitude', required=True)
     longitude = forms.FloatField(label='longitude', required=True)
     radius = forms.FloatField(label='radius', required=True)
@@ -109,7 +101,7 @@ class MarkAvailableForm(forms.Form):
     expire = forms.IntegerField(label='expire', required=True)
     latitude = forms.FloatField(label='latitude', required=True)
     longitude = forms.FloatField(label='longitude', required=True)
-    comment = forms.CharField(widget=forms.Textarea, label='comment', required=False)
+    comment = forms.CharField(widget=forms.Textarea, label='comment', required=True)
 
 
 class PickForm(forms.Form):

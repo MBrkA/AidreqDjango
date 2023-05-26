@@ -32,7 +32,14 @@ function add_item() {
     item.setAttribute("id", "item" + item_count);
     item.setAttribute("placeholder", "Item " + item_count);
     item.setAttribute("required", "true");
+    var amount = document.createElement("input");
+    amount.setAttribute("type", "number");
+    amount.setAttribute("name", "amount" + item_count);
+    amount.setAttribute("id", "amount" + item_count);
+    amount.setAttribute("placeholder", "Amount " + item_count);
+    amount.setAttribute("required", "true");
     document.getElementById("item_count").before(item)
+    document.getElementById("item_count").before(amount)
     document.getElementById("item_count").before(document.createElement("br"))
     document.getElementById("item_count").setAttribute("value", item_count);
 }
