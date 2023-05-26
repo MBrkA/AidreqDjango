@@ -13,71 +13,94 @@ socket.start()
 
 # Create your views here.
 
+
 def main(request):
     if request.session.get("token", False):
-        return redirect('/home')
+        campaign = request.session.get("campaign", False)
+        return redirect('/home', {'campaign': campaign})
 
     form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+    return redirect('/login', {'form': form})
 
 
 def home(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        campaign = request.session.get("campaign", False)
+        return redirect('/login')
     campaign = request.session.get("campaign", False)
     return render(request, 'home.html', {'campaign': campaign})
 
+
 def login_post(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            login_txt = "login " + form.cleaned_data['username'] + " " + form.cleaned_data['password']
-            with socket.cond:
-                socket.send_q.put(login_txt)
-                received = socket.recv_q.get()
-            if "Login successful." in received:
-                request.session["token"] = received.split(" ")[-1]
-                return redirect('/home')
-            else:
-                return redirect('/',{"error": "Invalid username or password"})
+    form = LoginForm(request.POST)
+    if form.is_valid():
+        with socket.cond:
+            socket.send_q.put("login " + form.cleaned_data["username"] + " " + form.cleaned_data["password"])
+            received = socket.recv_q.get()
+        if "Login successful" in received:
+            request.session["token"] = received.split(" ")[2]
+            campaign = request.session.get("campaign", False)
+            return redirect('/home', {'campaign': campaign})
         else:
-            return redirect('/')
+            return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
     else:
-        return redirect('/')
-    
+        return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
+
+
+def login(request):
+    form = LoginForm(request.GET)
+    return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
+
+
 def logout(request):
     with socket.cond:
-        socket.send_q.put("logout " + request.session["token"])
+        socket.send_q.put("logout")
         received = socket.recv_q.get()
     if "Logout successful" in received:
         request.session.flush()
-    return redirect('/')
+    return redirect('/login')
+
+
+def logout_post(request):
+    with socket.cond:
+        socket.send_q.put("logout")
+        received = socket.recv_q.get()
+    if "Logout successful" in received:
+        request.session.flush()
+    return redirect('/login')
 
 #################################
-##  FORM PAGES
+#  FORM PAGES
 #################################
 
-## CAMPAIGN FORM PAGES
+
+# CAMPAIGN FORM PAGES
 def create_campaign(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = CreateCampaignForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Create Campaign', 'action': 'create_campaign_post'})
+
+
 def list_campaigns(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     with socket.cond:
         socket.send_q.put("list")
         received = socket.recv_q.get()
     if "##EOF##" in received:
         received = received.replace("##EOF##", "")
-    campaigns = received.split("\n")
+    campaigns = received.split("\t")
     return render(request, 'result.html', {'result': campaigns})
+
+
 def open_campaign(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = OpenCampaignForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Open Campaign', 'action': 'open_campaign_post'})
+
+
 def close_campaign(request):
     create_txt = "close"
     with socket.cond:
@@ -86,96 +109,134 @@ def close_campaign(request):
     del request.session["campaign"]
     return render(request, 'result.html', {'result': received})
 
-## ITEMS FORM PAGES
+
+# ITEMS FORM PAGES
 def search_item(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = SearchItemForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Search Item', 'action': 'search_item_post'})
+
+
 def get_all_items(request):
     if not request.session.get("token", False):
-        return redirect('/')
-    
+        return redirect('/login')
+
+
 def update_item(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = UpdateItemForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Update Item', 'action': 'update_item_post'})
+
+
 def delete_item(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = RemoveItemForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Delete Item', 'action': 'delete_item_post'})
 
-## CAMPAIGN OPERATIONS FORM PAGES
+
+# CAMPAIGN OPERATIONS FORM PAGES
 def add_request(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = AddRequestForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Add Request', 'action': 'add_request_post'})
+
+
+def get_all_requests(request):
+    if not request.session.get("token", False):
+        return redirect('/login')
+    with socket.cond:
+        socket.send_q.put("get_all_requests")
+        received = socket.recv_q.get()
+    requests = received.split("\n")
+    return render(request, 'result.html', {'result': requests, 'title': 'All Requests In Campaign'})
+
+
 def get_request(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = GetRequestForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Get Request', 'action': 'get_request_post'})
+
+
 def update_request(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = UpdateRequestForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Update Request', 'action': 'update_request_post'})
+
+
 def remove_request(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = RemoveRequestForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Remove Request', 'action': 'remove_request_post'})
+
+
 def query_rect(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = QueryRectForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Query Rect', 'action': 'query_rect_post'})
+
+
 def query_circle(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = QueryCircleForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Query Circle', 'action': 'query_circle_post'})
+
+
 def watch_rect(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = WatchRectForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Watch Rect', 'action': 'watch_rect_post'})
+
+
 def watch_circle(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = WatchCircleForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Watch Circle', 'action': 'watch_circle_post'})
+
+
 def unwatch(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = UnwatchForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Unwatch', 'action': 'unwatch_post'})
 
-## REQUEST FORM PAGES
+
+# REQUEST FORM PAGES
 def mark_available(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = MarkAvailableForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post'})
+
+
 def pick(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = PickForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Pick', 'action': 'pick_post'})
+
+
 def arrived(request):
     if not request.session.get("token", False):
-        return redirect('/')
+        return redirect('/login')
     form = ArrivedForm()
     return render(request, 'form_page.html', {'form': form, 'title': 'Arrived', 'action': 'arrived_post'})
 
 #################################
-##  POST PAGES
+#  POST PAGES
 #################################
 
-## ITEMS POST PAGES
+# ITEMS POST PAGES
 def search_item_post(request):
     if request.method == 'POST':
         form = SearchItemForm(request.POST)
@@ -188,8 +249,12 @@ def search_item_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def get_all_items_post(request):
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def update_item_post(request):
     if request.method == 'POST':
         form = UpdateItemForm(request.POST)
@@ -202,6 +267,8 @@ def update_item_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def delete_item_post(request):
     if request.method == 'POST':
         form = RemoveItemForm(request.POST)
@@ -215,7 +282,8 @@ def delete_item_post(request):
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
 
-## CAMPAIGN POST PAGES
+
+# CAMPAIGN POST PAGES
 def create_campaign_post(request):
     if request.method == 'POST':
         form = CreateCampaignForm(request.POST)
@@ -229,6 +297,8 @@ def create_campaign_post(request):
             return render(request, 'result.html', {'result': "Invalid form"})
     else:
         return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def open_campaign_post(request):
     if request.method == 'POST':
         form = OpenCampaignForm(request.POST)
@@ -243,6 +313,8 @@ def open_campaign_post(request):
             return render(request, 'result.html', {'result': "Invalid form"})
     else:
         return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def add_request_post(request):
     if request.method == 'POST':
         form = AddRequestForm(request.POST)
@@ -255,6 +327,8 @@ def add_request_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def get_request_post(request):
     if request.method == 'POST':
         form = GetRequestForm(request.POST)
@@ -267,6 +341,8 @@ def get_request_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def update_request_post(request):
     if request.method == 'POST':
         form = UpdateRequestForm(request.POST)
@@ -279,6 +355,8 @@ def update_request_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def remove_request_post(request):
     if request.method == 'POST':
         form = RemoveRequestForm(request.POST)
@@ -291,6 +369,8 @@ def remove_request_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def query_rect_post(request):
     if request.method == 'POST':
         form = QueryRectForm(request.POST)
@@ -303,6 +383,8 @@ def query_rect_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def query_circle_post(request):
     if request.method == 'POST':
         form = QueryCircleForm(request.POST)
@@ -315,6 +397,8 @@ def query_circle_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def watch_rect_post(request):
     if request.method == 'POST':
         form = WatchRectForm(request.POST)
@@ -327,6 +411,8 @@ def watch_rect_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def watch_circle_post(request):
     if request.method == 'POST':
         form = WatchCircleForm(request.POST)
@@ -339,6 +425,8 @@ def watch_circle_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def unwatch_post(request):
     if request.method == 'POST':
         form = UnwatchForm(request.POST)
@@ -352,7 +440,8 @@ def unwatch_post(request):
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
 
-## REQUEST POST PAGES
+
+# REQUEST POST PAGES
 def mark_available_post(request):
     if request.method == 'POST':
         form = MarkAvailableForm(request.POST)
@@ -365,6 +454,8 @@ def mark_available_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def pick_post(request):
     if request.method == 'POST':
         form = PickForm(request.POST)
@@ -377,6 +468,8 @@ def pick_post(request):
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
+
+
 def arrived_post(request):
     if request.method == 'POST':
         form = ArrivedForm(request.POST)
@@ -390,4 +483,4 @@ def arrived_post(request):
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
 
-## POSTER METHOD
+# POSTER METHOD

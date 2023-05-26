@@ -1,49 +1,63 @@
-<html>
-    <head>
+<html lang="en">
+    <head><meta charset="utf-8">
         <title>Home</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     </head>
     <body>
-        <h1>Home</h1>
-        <ul>
-            <li><a href="/logout">Logout</a></li>
-        </ul>
-        <h1>Campaign</h1>
-        Campaign: {{campaign}}<br>
-        <ul>
-            <li><a href="/create_campaign">New Campaign</a></li>
-            <li><a href="/list_campaigns">List Campaigns</a></li>
-            {% if not campaign %}
-            <li><a href="/open_campaign">Open Campaign</a></li>
-            {% else %}
-            <li><a href="/close_campaign">Close Campaign</a></li>
-            {% endif %}
-        </ul>
-        <h1>Items</h1>
-        <ul>
-            <li><a href="/search_item">Search Item</a></li>
-            <li><a href="#">Get All Items</a></li>
-            <li><a href="/update_item">Update Item</a></li>
-            <li><a href="/delete_item">Delete Item</a></li>
-        </ul>
+    <nav class="navbar navbar-light" style="background-color: powderblue;">
+        <a class="navbar-brand"  href="/">Home</a>
+        <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
+    </nav>
+        <h1 align="middle">Home</h1>
+        <br>
+        <div class="row" style="text-align: justify-all; margin: 0 auto">
+            <div class="col-md-6" style="float: none; display: inline-block; vertical-align: middle">
+            <h1>Campaign</h1>
+            Current Campaign: {{campaign}}<br>
+            <ul>
+                <li><a href="/create_campaign">New Campaign</a></li>
+                <li><a href="/list_campaigns">List Campaigns</a></li>
+                {% if not campaign %}
+                <li><a href="/open_campaign">Open Campaign</a></li>
+                {% else %}
+                <li><a href="/close_campaign">Close Campaign</a></li>
+                {% endif %}
+            </ul>
+            <h1>Items</h1>
+            <ul>
+                <li><a href="/search_item">Search Item</a></li>
+                <li><a href="#">Get All Items</a></li>
+                <li><a href="/update_item">Update Item</a></li>
+                <li><a href="/delete_item">Delete Item</a></li>
+            </ul>
+        </div>
         {% if campaign %}
-        <h1>Campaign Operations</h1>
-        <ul>
-            <li><a href="/add_request">Add Request</a></li>
-            <li><a href="/get_request">Get Request</a></li>
-            <li><a href="/update_request">Update Request</a></li>
-            <li><a href="/remove_request">Remove Request</a></li>
-            <li><a href="/query_rect">Query(Rectangular)</a></li>
-            <li><a href="/query_circle">Query(Circular)</a></li>
-            <li><a href="/watch_rect">Watch(Rectangular)</a></li>
-            <li><a href="/watch_circle">Watch(Circular)</a></li>
-            <li><a href="/unwatch">Unwatch</a></li>
-        </ul>
-        <h1>Request</h1>
-        <ul>
-            <li><a href="/mark_available">Mark Available</a></li>
-            <li><a href="/pick">Pick</a></li>
-            <li><a href="/arrived">Arrived</a></li>
-        </ul>
+        <div class="col-md-6">
+            <h1>Campaign Operations</h1>
+            <ul>
+                <li><a href="/add_request">Add Request</a></li>
+                <li><a href="/get_all_requests">List Requests</a></li>
+                <li><a href="/get_request">Get Request</a></li>
+                <li><a href="/update_request">Update Request</a></li>
+                <li><a href="/remove_request">Remove Request</a></li>
+                <li><a href="/query_rect">Query(Rectangular)</a></li>
+                <li><a href="/query_circle">Query(Circular)</a></li>
+                <li><a href="/watch_rect">Watch(Rectangular)</a></li>
+                <li><a href="/watch_circle">Watch(Circular)</a></li>
+                <li><a href="/unwatch">Unwatch</a></li>
+            </ul>
+            <h1>Request</h1>
+            <ul>
+                <li><a href="/mark_available">Mark Available</a></li>
+                <li><a href="/pick">Pick</a></li>
+                <li><a href="/arrived">Arrived</a></li>
+            </ul>
+        </div>
         {% endif %}
+        </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     </body>
 </html>

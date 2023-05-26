@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main),
     path('home/', views.home),
+    path('login/', views.login),
     path('logout/', views.logout),
     ## FORM PAGES
     path('create_campaign/', views.create_campaign),
@@ -33,6 +34,7 @@ urlpatterns = [
     path('update_item/', views.update_item),
     path('delete_item/', views.delete_item),
     path('add_request/', views.add_request),
+    path('get_all_requests/', views.get_all_requests),
     path('get_request/', views.get_request),
     path('update_request/', views.update_request),
     path('remove_request/', views.remove_request),
@@ -46,6 +48,7 @@ urlpatterns = [
     path('arrived/', views.arrived),
     ## API
     re_path('login_post/', views.login_post),
+    re_path('logout_post/', views.logout_post),
     re_path('search_item_post/', views.search_item_post),
     re_path('get_all_items_post/', views.get_all_items_post),
     re_path('update_item_post/', views.update_item_post),
