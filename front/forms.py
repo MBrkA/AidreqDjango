@@ -43,7 +43,7 @@ class GetAllRequestsForm(forms.Form):
     campaign = forms.CharField(label='campaign', max_length=64, required=True)
 
 class GetRequestForm(forms.Form):
-    request = forms.CharField(label='request', max_length=64, required=True)
+    request = forms.CharField(widget=forms.Select(choices=[]), label='Urgency', required=True)
 
 class UpdateRequestForm(forms.Form):
     request = forms.CharField(label='requestid', max_length=64, required=True)

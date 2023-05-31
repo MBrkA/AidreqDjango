@@ -8,11 +8,13 @@
             <a class="navbar-brand"  href="/">Home</a>
             <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
         </nav>
-        <h1>{{title}}</h1>
-        <form method="post" action="/{{action}}/">
-            {% csrf_token %}
-            {{form.as_p}}
-            <input type="submit" value="Send" />
-        </form>
+        <div class="container" style="margin: 20px;">
+            <h1>{{title}}</h1>
+            <form method="post" action="/{{action}}/">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type="submit" value="Send" />
+            </form>
+        </div>
     </body>
 </html>

@@ -1,16 +1,66 @@
 <html lang="en">
     <head>
         <title>Log In</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
     </head>
     <body>
-        <h1>Log In</h1>
-        <form method="post" action="/login_post/">
-            {% csrf_token %}
-            {{form.as_p}}
-            <input type="submit" value="Log In" />
-            {% if error %}
-                <p>{{error}}</p>
-            {% endif %}
-        </form>
+        
+        <section class="h-100 gradient-form" style="background-color: #eee;">
+            <div class="container py-5 h-100">
+              <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-xl-6">
+                  <div class="card rounded-3 text-black">
+                    <div class="row g-0">
+                      <div class="col-lg-12">
+                        <div class="card-body p-md-5 mx-md-4">
+          
+                          <div class="text-center">
+                            <img src="https://tanitim.ceng.metu.edu.tr/images/ceng_400x400.png"
+                              style="width: 185px;" alt="logo">
+                            <h4 class="mt-1 mb-5 pb-1">Aid Delivery System</h4>
+                          </div>
+          
+                          <form method="post" action="/login_post/">
+                            {% csrf_token %}
+                            <p>Please login to your account</p>
+                            <p style="color: red;">{{error}}</p>
+          
+                            <div class="form-outline mb-4">
+                                {{form.username}}
+                            </div>
+          
+                            <div class="form-outline mb-4">
+                                {{form.password}}
+                            </div>
+          
+                            <div class="text-center pt-1 mb-5 pb-1">
+                              <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Log
+                                in</button>
+                            </div>
+          
+          
+                          </form>
+          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <script>
+                document.getElementById("id_username").placeholder = "Username";
+                document.getElementById("id_password").placeholder = "Password";
+                document.getElementById("id_username").className += " form-control";
+                document.getElementById("id_password").className += " form-control";
+            </script>
+          </section>
+          <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+          <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+          <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+          <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+          
+
     </body>
 </html>

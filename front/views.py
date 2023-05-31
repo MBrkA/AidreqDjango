@@ -60,9 +60,9 @@ def login_post(request):
             request.session['username'] = form.cleaned_data["username"]
             return redirect('/home', {'campaign': False, 'username': form.cleaned_data["username"]})
         else:
-            return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
+            return render(request, 'login.html', {'form': form, 'error': 'Invalid username or password!', 'title': 'Login', 'action': 'login_post'})
     else:
-        return render(request, 'form_page.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
+        return render(request, 'login.html', {'form': form, 'error': 'Encountered an error!' ,'title': 'Login', 'action': 'login_post'})
 
 #################################
 #  FORM PAGES
@@ -142,8 +142,9 @@ def get_all_requests(request):
 def get_request(request):
     if not request.session.get('token', False):
         return redirect('/login')
+    received = socket_service(f"{request.session.get('token')} get_all_requests", test_socket)
     form = GetRequestForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Get Request', 'action': 'get_request_post'})
+    return render(request, 'get_request.html', {'form': form,'requests': received,'title': 'Get Request', 'action': 'get_request_post'})
 
 
 def update_request(request):
@@ -308,7 +309,7 @@ def get_request_post(request):
         if form.is_valid():
             get_txt = request.session.get('token') + " get_request " + form.cleaned_data['request']
             received = socket_service(get_txt, test_socket)
-            return render(request, 'result.html', {'result': received})
+            return render(request, 'request_info.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
