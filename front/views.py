@@ -160,14 +160,22 @@ def update_request(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = UpdateRequestForm()
-    return render(request, 'form_page_itemreq.html', {'form': form, 'title': 'Update Request', 'action': 'update_request_post'})
+    received = socket_service(f"{request.session.get('token')} get_all_requests", test_socket)
+    requests = received.split("\n")
+    if "No requests found" in requests:
+        return render(request, 'result.html', {'result': requests})
+    return render(request, 'campaign/update_request.html', {'form': form, 'title': 'Update Request', 'action': 'update_request_post', 'requests': requests})
 
 
 def remove_request(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = RemoveRequestForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Remove Request', 'action': 'remove_request_post'})
+    received = socket_service(f"{request.session.get('token')} get_all_requests", test_socket)
+    requests = received.split("\n")
+    if "No requests found" in requests:
+        return render(request, 'result.html', {'result': requests})
+    return render(request, 'campaign/remove_request.html', {'form': form, 'title': 'Remove Request', 'action': 'remove_request_post', 'requests': requests})
 
 
 def query_rect(request):

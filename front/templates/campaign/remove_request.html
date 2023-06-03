@@ -1,0 +1,45 @@
+<html lang="en">
+    <head><meta charset="utf-8">
+        <title>Form</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    </head>
+    <body>
+        <nav class="navbar navbar-light" style="background-color: powderblue;">
+            <a class="navbar-brand"  href="/">Home</a>
+            <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
+        </nav>
+        <div class="container container-fluid mt-3">
+            <div class="row">
+                <div class="col-md-12" style="text-align: center;">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h1>{{title}}</h1>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="/{{action}}/">
+                                {% csrf_token %}
+                                {{form.as_p}}
+                                <input type="submit" class="btn btn-primary" value="Send" />
+                            </form>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        <script data-req="{{requests}}">
+    
+            var req = document.currentScript.getAttribute('data-req');
+            if (req != ""){
+                req = JSON.parse(req.replaceAll('\'','\"')); 
+            }
+            for (var i = 0; i < req.length; i++) {
+                var option = document.createElement("option");
+                option.setAttribute("value", req[i]);
+                option.innerHTML = req[i];
+                document.getElementById("id_request").appendChild(option);
+            }
+            document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
+            document.querySelectorAll("select").forEach(e => e.classList.add("form-control"))
+        </script>
+    </body>
+</html>

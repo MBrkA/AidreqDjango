@@ -35,8 +35,19 @@
             </div>
         </div>        
     </div>
-    <script>
+    <script data-req="{{requests}}">
 
+        var req = document.currentScript.getAttribute('data-req');
+        if (req != ""){
+            req = JSON.parse(req.replaceAll('\'','\"')); 
+        }
+        for (var i = 0; i < req.length; i++) {
+            var option = document.createElement("option");
+            option.setAttribute("value", req[i]);
+            option.innerHTML = req[i];
+            document.getElementById("id_request").appendChild(option);
+        }
+        
         item_count = 0;
         function add_item() {
             item_count++;
