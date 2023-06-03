@@ -15,7 +15,7 @@
         <a class="navbar-brand"  href="/">Home</a>
         <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
     </nav>
-    <div class="container" style="margin: 20px;">
+    <div class="container mt-3">
         <div class="row">
             <div class="col-8" id="req">
                 <div class="card">
@@ -113,8 +113,8 @@
         }
 
 
-        const map = L.map('map').setView([req["geoloc"][0], req["geoloc"][1]], 13);
-        var marker = L.marker([req["geoloc"][0], req["geoloc"][1]]).addTo(map);
+        const map = L.map('map').setView([req["geoloc"][1], req["geoloc"][0]], 13);
+        var marker = L.marker([req["geoloc"][1], req["geoloc"][0]]).addTo(map);
     
         const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,

@@ -15,7 +15,7 @@
         <a class="navbar-brand"  href="/">Home</a>
         <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
     </nav>
-    <div class="container" style="margin: 20px;">
+    <div class="container mt-3">
         <div class="row">
             <div class="col-12" id="req">
                 <div class="card">
@@ -69,6 +69,10 @@
             //document.getElementById("item_count").before(amount)
             //document.getElementById("item_count").before(document.createElement("br"))
             document.getElementById("item_count").setAttribute("value", item_count);
+            var map = document.createElement("div");
+            map.setAttribute("id", "map");
+            map.setAttribute("style", "width: 600px; height: 400px; margin-top: 10px;");
+            document.getElementById("id_longitude").after(map);
             
         }
         add_item();
@@ -78,6 +82,34 @@
         
     
     </script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([39.89178919874682, 32.78354912996293], 13);
+        var marker;
+        // Create a tile layer for the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+          maxZoom: 18,
+        }).addTo(map);
+      
+        // Initialize the location selector input
+        function onMapClick(e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+        document.getElementById("id_latitude").value = lat;
+        document.getElementById("id_longitude").value = lng;
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        // Create a new marker and add it to the map
+        marker = L.marker([lat, lng]).addTo(map);
+        // You can perform further actions with the obtained coordinates here
+        }
+
+        map.on('click', onMapClick);
+
+      </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
