@@ -128,7 +128,7 @@ def add_request(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = AddRequestForm()
-    return render(request, 'form_page_itemreq.html', {'form': form, 'title': 'Add Request', 'action': 'add_request_post'})
+    return render(request, 'campaign/add_request.html', {'form': form, 'title': 'Add Request', 'action': 'add_request_post'})
 
 
 def get_all_requests(request):

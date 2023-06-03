@@ -31,6 +31,9 @@
                 option.innerHTML = reqs[i];
                 document.getElementById("id_request").appendChild(option);
             }
+            document.querySelectorAll("input").forEach(e => e.setAttribute("class","form-control"))
+            document.querySelectorAll("select").forEach(e => e.setAttribute("class","form-control"))
+
             
         </script>
     </body>
