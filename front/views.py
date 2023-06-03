@@ -40,6 +40,8 @@ def login(request):
 
 
 def logout(request):
+    if request.session.get('token', False):
+        return redirect('/home')
     received = socket_service(f"{request.session.get('token')} logout", test_socket)
     if "Logout successful" in received:
         request.session.flush()
@@ -50,6 +52,8 @@ def logout(request):
 #################################
 
 def login_post(request):
+    if request.session.get('token', False):
+        return redirect('/home')
     form = LoginForm(request.POST)
     if form.is_valid():
         login_txt = "login " + form.cleaned_data["username"] + " " + form.cleaned_data["password"]
@@ -84,7 +88,7 @@ def list_campaigns(request):
     if "##EOF##" in received:
         received = received.replace("##EOF##", "")
     campaigns = received.split("\t")
-    return render(request, 'result.html', {'result': campaigns})
+    return render(request, 'main/list_campaigns.html', {'result': campaigns})
 
 
 def open_campaign(request):
@@ -95,6 +99,8 @@ def open_campaign(request):
 
 
 def close_campaign(request):
+    if request.session.get('token', False):
+        return redirect('/home')
     create_txt = request.session.get('token') + " close"
     received = socket_service(create_txt, test_socket)
     del request.session["campaign"]

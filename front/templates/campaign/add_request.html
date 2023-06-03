@@ -28,7 +28,7 @@
                             <input type="number" name="item_count" id="item_count" value="0" hidden>
                             <button type="button" class="btn btn-primary" onclick="add_item()">Add Item</button><br>
                             {{form.as_p}}
-                            <input id="submitBtn" type="submit" value="Send" />
+                            <input id="submitBtn" class="btn btn-primary" type="submit" value="Send" />
                         </form>
                     </div>
                 </div>
@@ -76,9 +76,9 @@
             
         }
         add_item();
-        document.querySelectorAll("input").forEach(e => e.setAttribute("class","form-control"))
-        document.querySelectorAll("textarea").forEach(e => e.setAttribute("class","form-control"))
-        document.querySelectorAll("select").forEach(e => e.setAttribute("class","form-control"))
+        document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
+        document.querySelectorAll("textarea").forEach(e => e.classList.add("form-control"))
+        document.querySelectorAll("select").forEach(e => e.classList.add("form-control"))
         
     
     </script>

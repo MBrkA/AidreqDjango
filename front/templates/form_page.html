@@ -8,17 +8,27 @@
             <a class="navbar-brand"  href="/">Home</a>
             <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
         </nav>
-        <div class="container" style="margin: 20px;">
-            <h1>{{title}}</h1>
-            <form method="post" action="/{{action}}/">
-                {% csrf_token %}
-                {{form.as_p}}
-                <input type="submit" value="Send" />
-            </form>
+        <div class="container container-fluid mt-3">
+            <div class="row">
+                <div class="col-md-12" style="text-align: center;">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h1>{{title}}</h1>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="/{{action}}/">
+                                {% csrf_token %}
+                                {{form.as_p}}
+                                <input type="submit" class="btn btn-primary" value="Send" />
+                            </form>
+                        </div>
+                    </div> 
+                </div>
+            </div>
         </div>
         <script>
-            document.querySelectorAll("input").forEach(e => e.setAttribute("class","form-control"))
-            document.querySelectorAll("textarea").forEach(e => e.setAttribute("class","form-control"))
+            document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
+            document.querySelectorAll("textarea").forEach(e => e.classList.add("form-control"))
         </script>
     </body>
 </html>

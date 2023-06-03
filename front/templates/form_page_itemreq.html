@@ -8,17 +8,29 @@
             <a class="navbar-brand"  href="/">Home</a>
             <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
         </nav>
-        <h1>{{title}}</h1>
-        <form method="post" action="/{{action}}/" id="form">
-            {% csrf_token %}
-            
-            Items:<br>
-            <input type="number" name="item_count" id="item_count" value="0" hidden>
-            <input type="button" value="Add Item" onclick="add_item()" /><br>
-            {{form.as_p}}
-            <input id="submitBtn" type="submit" value="Send" />
-        </form>
-        <br>
+
+        <div class="container container-fluid mt-3">
+            <div class="row">
+                <div class="col-md-12" style="text-align: center;">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h1>{{title}}</h1>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="/{{action}}/" id="form">
+                                {% csrf_token %}
+                                
+                                Items:<br>
+                                <input type="number" name="item_count" id="item_count" value="0" hidden>
+                                <input type="button" value="Add Item" onclick="add_item()" /><br>
+                                {{form.as_p}}
+                                <input id="submitBtn" type="submit" class="btn btn-primary" value="Send" />
+                            </form>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
     </body>
 </html>
 
@@ -32,18 +44,21 @@ function add_item() {
     item.setAttribute("id", "item" + item_count);
     item.setAttribute("placeholder", "Item " + item_count);
     item.setAttribute("required", "true");
+
     var amount = document.createElement("input");
     amount.setAttribute("type", "number");
     amount.setAttribute("name", "amount" + item_count);
     amount.setAttribute("id", "amount" + item_count);
     amount.setAttribute("placeholder", "Amount " + item_count);
     amount.setAttribute("required", "true");
+
     document.getElementById("item_count").before(item)
     document.getElementById("item_count").before(amount)
     document.getElementById("item_count").before(document.createElement("br"))
     document.getElementById("item_count").setAttribute("value", item_count);
-    document.querySelectorAll("input").forEach(e => e.setAttribute("class","form-control"))
-    document.querySelectorAll("textarea").forEach(e => e.setAttribute("class","form-control"))
+
 }
 add_item();
+    document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
+    document.querySelectorAll("textarea").forEach(e => e.classList.add("form-control"))
 </script>
