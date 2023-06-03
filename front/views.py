@@ -182,7 +182,7 @@ def query_rect(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = QueryRectForm()
-    return render(request, 'form_page_item.html', {'form': form, 'title': 'Query Rect', 'action': 'query_rect_post'})
+    return render(request, 'form_page_item.html', {'form': form, 'title': 'Query Rectangular', 'action': 'query_rect_post'})
 
 
 def query_circle(request):
@@ -196,7 +196,7 @@ def watch_rect(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = WatchRectForm()
-    return render(request, 'form_page_item.html', {'form': form, 'title': 'Watch Rect', 'action': 'watch_rect_post'})
+    return render(request, 'form_page_item.html', {'form': form, 'title': 'Watch Rectangular', 'action': 'watch_rect_post'})
 
 
 def watch_circle(request):
@@ -210,7 +210,10 @@ def unwatch(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = UnwatchForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Unwatch', 'action': 'unwatch_post'})
+    received = socket_service(f"{request.session.get('token')} get_watches", test_socket)
+    if "No watches found" in received:
+        return render(request, 'result.html', {'result': received})
+    return render(request, 'campaign/unwatch.html', {'form': form, 'title': 'Unwatch', 'action': 'unwatch_post', 'watches': received})
 
 
 # REQUEST FORM PAGES
@@ -403,6 +406,7 @@ def watch_rect_post(request):
             for i in range(int(data['item_count'])):
                 item += data[f"item{i+1}"] + " "
             watch_txt = f"{request.session.get('token')} watch {data['item_count']}{item}0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
+            print(watch_txt)
             received = socket_service(watch_txt, test_socket)
             return render(request, 'result.html', {'result': received})
         else:

@@ -11,7 +11,7 @@
 
         <div class="container container-fluid mt-3">
             <div class="row">
-                <div class="col-md-12" style="text-align: center;">
+                <div class="col-md-12">
                     <div class="card mb-3">
                         <div class="card-header">
                             <h1>{{title}}</h1>
@@ -44,13 +44,13 @@ function add_item() {
     item.setAttribute("id", "item" + item_count);
     item.setAttribute("placeholder", "Item " + item_count);
     item.setAttribute("required", "true");
+    item.setAttribute("class", "form-control");
 
     document.getElementById("item_count").before(item)
-    document.getElementById("item_count").before(document.createElement("br"))
     document.getElementById("item_count").setAttribute("value", item_count);
 }
 add_item();
 
 document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
-document.querySelectorAll("textarea").forEach(e => e.classList.add("form-control"))
+document.querySelectorAll("select").forEach(e => e.classList.add("form-control"))
 </script>

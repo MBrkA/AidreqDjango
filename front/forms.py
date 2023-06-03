@@ -90,7 +90,8 @@ class WatchCircleForm(forms.Form):
 
 
 class UnwatchForm(forms.Form):
-    watch = forms.CharField(label='Watchid', max_length=64, required=True)
+    #watch = forms.CharField(label='Watchid', max_length=64, required=True)
+    watch = forms.CharField(widget=forms.Select(choices=[]), label='Watchid', required=True)
 
 
 # REQUEST FORMS

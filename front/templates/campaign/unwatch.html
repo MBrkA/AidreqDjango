@@ -10,7 +10,7 @@
         </nav>
         <div class="container container-fluid mt-3">
             <div class="row">
-                <div class="col-md-12" >
+                <div class="col-md-12" style="text-align: center;">
                     <div class="card mb-3">
                         <div class="card-header">
                             <h1>{{title}}</h1>
@@ -26,9 +26,16 @@
                 </div>
             </div>
         </div>
-        <script>
+        <script data-ids="{{watches}}">
+            var req = document.currentScript.getAttribute('data-ids');
+            req = JSON.parse(req.replaceAll("\'","\"")).values
+            for (var i = 0; i < req.length; i++) {
+                var option = document.createElement("option");
+                option.setAttribute("value", req[i]);
+                option.innerHTML = req[i];
+                document.getElementById("id_watch").appendChild(option);
+            }
             document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
-            document.querySelectorAll("textarea").forEach(e => e.classList.add("form-control"))
             document.querySelectorAll("select").forEach(e => e.classList.add("form-control"))
         </script>
     </body>

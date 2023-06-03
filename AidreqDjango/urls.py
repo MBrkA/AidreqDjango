@@ -40,7 +40,7 @@ urlpatterns = [
     path('query_rect/', views.query_rect),
     path('query_circle/', views.query_circle),
     path('watch_rect/', views.watch_rect),
-    path('watch_circle/', views.watch_rect),
+    path('watch_circle/', views.watch_circle),
     path('unwatch/', views.unwatch),
     path('mark_available/', views.mark_available),
     path('pick/', views.pick),
