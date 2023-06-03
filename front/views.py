@@ -153,6 +153,8 @@ def get_request(request):
         return redirect('/login')
     received = socket_service(f"{request.session.get('token')} get_all_requests", test_socket)
     form = GetRequestForm()
+    if "No requests found" in received:
+        return render(request, 'result.html', {'result': received})
     return render(request, 'campaign/get_request.html', {'form': form,'requests': received,'title': 'Get Request', 'action': 'get_request_post'})
 
 
