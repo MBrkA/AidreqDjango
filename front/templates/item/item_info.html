@@ -17,7 +17,19 @@
                             <h1>Result</h1>
                         </div>
                         <div class="card-body">
-                            {{result}}
+                            <table class="table" >
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Synonyms</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody">
+                                    <tr>
+                                        <td id="name"></td>
+                                        <td id="synonyms"></td>
+                                </tbody>
+                              </table>
                         </div>
                         <div class="card-footer d-flex">
                             <button class="btn btn-primary" onclick="window.location.href='/home'"> Home</button>
@@ -28,7 +40,9 @@
         </div>
         <script data-req="{{result}}">
             reqs = document.currentScript.getAttribute('data-req')
-            console.log(reqs)
+            data = JSON.parse(reqs.replaceAll("\'","\""))
+            document.getElementById("name").innerHTML = data.name
+            document.getElementById("synonyms").innerHTML = data.synonyms
         </script>
     </body>
 </html>

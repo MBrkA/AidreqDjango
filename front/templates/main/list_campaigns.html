@@ -41,11 +41,9 @@
         var req = document.currentScript.getAttribute('data-req');
         console.log(req);
 
-        if (req != ""){
-            req = JSON.parse(req.replaceAll('\'','\"')); 
-        }
-
-        if (req[0] == "No campaigns found"){
+        test = JSON.parse(req.replaceAll("\'",""))
+        test = test[0].values
+        if (test.length == []){
             var tr = document.createElement("tr");
             var td = document.createElement("td");
             td.setAttribute("colspan", "2");
@@ -53,11 +51,14 @@
             tr.appendChild(td);
             document.getElementById("tbody").appendChild(tr);
         } else {
-            for (var i = 0; i < req.length; i++) {
+            for (var i = 0; i < test.length; i++) {
                 var tr = document.createElement("tr");
-                var td = document.createElement("td");
-                td.innerHTML = req[i];
-                tr.appendChild(td);
+                var td_n = document.createElement("td");
+                td_n.innerHTML = test[i].name;
+                var td_d = document.createElement("td");
+                td_d.innerHTML = test[i].description;
+                tr.appendChild(td_n);
+                tr.appendChild(td_d);
                 document.getElementById("tbody").appendChild(tr);
             }
         }

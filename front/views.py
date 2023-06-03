@@ -40,8 +40,6 @@ def login(request):
 
 
 def logout(request):
-    if request.session.get('token', False):
-        return redirect('/home')
     received = socket_service(f"{request.session.get('token')} logout", test_socket)
     if "Logout successful" in received:
         request.session.flush()
@@ -95,7 +93,12 @@ def open_campaign(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = OpenCampaignForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Open Campaign', 'action': 'open_campaign_post'})
+
+    received = socket_service(f"{request.session.get('token')} list", test_socket)
+    if "##EOF##" in received:
+        received = received.replace("##EOF##", "")
+    campaigns = received.split("\t")
+    return render(request, 'main/open_campaign.html', {'form': form, 'title': 'Open Campaign', 'action': 'open_campaign_post', 'result': campaigns})
 
 
 def close_campaign(request):
@@ -234,7 +237,9 @@ def search_item_post(request):
         if form.is_valid():
             search_txt = request.session.get('token') + " search_item " + form.cleaned_data['name']
             received = socket_service(search_txt, test_socket)
-            return render(request, 'result.html', {'result': received})
+            if (received == "Item does not exist"):
+                return render(request, 'result.html', {'result': received})
+            return render(request, 'item/item_info.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})

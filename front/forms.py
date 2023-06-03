@@ -29,7 +29,8 @@ class CreateCampaignForm(forms.Form):
 
 
 class OpenCampaignForm(forms.Form):
-    name = forms.CharField(label='Name', max_length=64, required=True)
+    name = forms.CharField(widget=forms.Select(choices=[]), label='Campaign', required=True)
+    #name = forms.CharField(label='Name', max_length=64, required=True)
 
 
 class AddRequestForm(forms.Form):

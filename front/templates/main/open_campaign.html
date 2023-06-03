@@ -1,6 +1,6 @@
 <html lang="en">
     <head><meta charset="utf-8">
-        <title>Result</title>
+        <title>Form</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     </head>
     <body>
@@ -8,27 +8,41 @@
             <a class="navbar-brand"  href="/">Home</a>
             <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
         </nav>
-
         <div class="container container-fluid mt-3">
             <div class="row">
                 <div class="col-md-12" style="text-align: center;">
                     <div class="card mb-3">
                         <div class="card-header">
-                            <h1>Result</h1>
+                            <h1>{{title}}</h1>
                         </div>
                         <div class="card-body">
-                            {{result}}
-                        </div>
-                        <div class="card-footer d-flex">
-                            <button class="btn btn-primary" onclick="window.location.href='/home'"> Home</button>
+                            <form method="post" action="/{{action}}/">
+                                {% csrf_token %}
+                                {{form.as_p}}
+                                <input type="submit" class="btn btn-primary" value="Select" />
+                            </form>
                         </div>
                     </div> 
                 </div>
             </div>
         </div>
         <script data-req="{{result}}">
-            reqs = document.currentScript.getAttribute('data-req')
-            console.log(reqs)
+
+            var req = document.currentScript.getAttribute('data-req');
+            data = JSON.parse(req.replaceAll("\'",""))
+            data = data[0].values
+
+
+            for (var i = 0; i < data.length; i++) {
+                var input = document.createElement("option");
+                input.setAttribute("value", data[i].name);
+                input.innerHTML = data[i].name;
+                document.getElementById("id_name").appendChild(input);
+            }
+
+
+            document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
+            document.querySelectorAll("select").forEach(e => e.classList.add("form-control"))
         </script>
     </body>
 </html>
