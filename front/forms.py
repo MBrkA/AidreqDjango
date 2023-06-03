@@ -47,8 +47,6 @@ class GetRequestForm(forms.Form):
 
 class UpdateRequestForm(forms.Form):
     request = forms.CharField(label='requestid', max_length=64, required=True)
-    item = forms.CharField(label='item', max_length=64, required=True)
-    amount = forms.IntegerField(label='quantity', required=True)
     latitude = forms.FloatField(label='latitude', required=True)
     longitude = forms.FloatField(label='longitude', required=True)
     urgency = forms.CharField(widget=forms.Select(choices=[('URGENT', 'URGENT'), ('SOON', 'SOON'), ('DAYS', 'DAYS'), ('WEEKS','WEEKS'), ('OPTIONAL','OPTIONAL')]), label='urgency', required=True)

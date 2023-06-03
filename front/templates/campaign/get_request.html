@@ -8,12 +8,18 @@
             <a class="navbar-brand"  href="/">Home</a>
             <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
         </nav>
-        <h1>{{title}}</h1>
-        <form method="post" action="/{{action}}/">
-            {% csrf_token %}
-            {{form.as_p}}
-            <input type="submit" value="Send" />
-        </form>
+        <div class="container" style="margin: 20px;">
+            <div class="card">
+                <h5 class="card-header">{{title}}</h5>
+                <div class="card-body">
+                    <form method="post" action="/{{action}}/">
+                        {% csrf_token %}
+                        {{form.as_p}}
+                        <input type="submit" class="btn btn-primary" value="Send" />
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <script data-req="{{requests}}">
             reqs = document.currentScript.getAttribute('data-req').split('\n');

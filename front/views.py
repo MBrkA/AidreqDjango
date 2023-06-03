@@ -136,7 +136,7 @@ def get_all_requests(request):
         return redirect('/login')
     received = socket_service(f"{request.session.get('token')} get_all_requests", test_socket)
     requests = received.split("\n")
-    return render(request, 'result.html', {'result': requests, 'title': 'All Requests In Campaign'})
+    return render(request, 'campaign/list_requests.html', {'result': requests, 'title': 'All Requests In Campaign'})
 
 
 def get_request(request):
@@ -144,7 +144,7 @@ def get_request(request):
         return redirect('/login')
     received = socket_service(f"{request.session.get('token')} get_all_requests", test_socket)
     form = GetRequestForm()
-    return render(request, 'get_request.html', {'form': form,'requests': received,'title': 'Get Request', 'action': 'get_request_post'})
+    return render(request, 'campaign/get_request.html', {'form': form,'requests': received,'title': 'Get Request', 'action': 'get_request_post'})
 
 
 def update_request(request):
@@ -309,7 +309,7 @@ def get_request_post(request):
         if form.is_valid():
             get_txt = request.session.get('token') + " get_request " + form.cleaned_data['request']
             received = socket_service(get_txt, test_socket)
-            return render(request, 'request_info.html', {'result': received})
+            return render(request, 'campaign/request_info.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
     return render(request, 'result.html', {'result': "Invalid request"})
