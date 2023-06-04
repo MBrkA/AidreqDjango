@@ -24,7 +24,7 @@
                         <table class="table" >
                             <thead>
                                 <tr>
-                                    <th scope="col">Req ID</th>
+                                    <th scope="col" colspan="2">Req ID</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody">
@@ -47,15 +47,23 @@
         if (req[0] == "No requests found"){
             var tr = document.createElement("tr");
             var td = document.createElement("td");
+            td.setAttribute("colspan", "2");
             td.innerHTML = "No requests found";
             tr.appendChild(td);
             document.getElementById("tbody").appendChild(tr);
         } else {
             for (var i = 0; i < req.length; i++) {
                 var tr = document.createElement("tr");
-                var td = document.createElement("td");
-                td.innerHTML = req[i];
-                tr.appendChild(td);
+                var td_id = document.createElement("td");
+                td_id.innerHTML = req[i];
+                var td_btn = document.createElement("td");
+                var btn = document.createElement("button");
+                btn.setAttribute("class", "btn btn-primary");
+                btn.setAttribute("onclick", "window.location.href='/get_request_post/?id="+req[i]+"'");
+                btn.innerHTML = "View";
+                td_btn.appendChild(btn);
+                tr.appendChild(td_id);
+                tr.appendChild(td_btn);
                 document.getElementById("tbody").appendChild(tr);
             }
         }

@@ -102,7 +102,7 @@ def open_campaign(request):
 
 
 def close_campaign(request):
-    if request.session.get('token', False):
+    if not request.session.get('token', False):
         return redirect('/home')
     create_txt = request.session.get('token') + " close"
     received = socket_service(create_txt, test_socket)
@@ -336,6 +336,10 @@ def get_request_post(request):
             return render(request, 'campaign/request_info.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
+    elif request.method == 'GET':
+        get_txt = request.session.get('token') + " get_request " + request.GET.dict()['id']
+        received = socket_service(get_txt, test_socket)
+        return render(request, 'campaign/request_info.html', {'result': received})
     return render(request, 'result.html', {'result': "Invalid request"})
 
 
