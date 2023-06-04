@@ -50,7 +50,6 @@
                                     <td colspan="2">
                                         <button class="btn btn-secondary" data-toggle="collapse" data-target="#collapseItem" role="button">Raw Data</button>
                                         <div id="collapseItem" class="collapse" style="margin-top: 5px;"></div>
-                                        <button class="btn btn-primary" onclick="addMarkAvailable()" role="button">Mark Available</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -171,6 +170,14 @@
         for (var i = 0; i < req["items"].length; i++){
             document.getElementById("ul-items").innerHTML += `<li>${req["items"][i]["item"]["name"]} (${req["items"][i]["amount"]})</li>`;
         }
+        if (req["status"] != "CLOSED"){
+            var button = document.createElement("button");
+            button.setAttribute("class", "btn btn-primary");
+            button.setAttribute("onclick", "addMarkAvailable()");
+            button.setAttribute("role", "button");
+            button.innerHTML = "Mark Available";
+            document.getElementById("collapseItem").after(button);
+        }
         for (var i = 0; i < req["availibility"].length; i++){
             var tr = document.createElement("tr");
             var td_id = document.createElement("td");
@@ -180,12 +187,6 @@
             var td_geoloc = document.createElement("td");
             var td_comments = document.createElement("td");
             var td_button = document.createElement("td");
-            var button = document.createElement("button");
-            button.setAttribute("class", "btn btn-primary");
-            button.setAttribute("onclick", `addOnRoute(${req["availibility"][i]["id"]})`);
-            button.setAttribute("onclick", "window.location.href='/pick/?req_id="+req_id+"&ma_id="+req["availibility"][i]["ma_id"]+"&item="+req["availibility"][i]["item"]+"'");
-            button.innerHTML = "Select";
-            td_button.appendChild(button);
             td_id.innerHTML = req["availibility"][i]["ma_id"];
             td_item.innerHTML = `${req["availibility"][i]["item"]}(${req["availibility"][i]["amount"]})`;
             td_supplier.innerHTML = req["availibility"][i]["supplier"];
@@ -198,7 +199,25 @@
             tr.appendChild(td_expire);
             tr.appendChild(td_geoloc);
             tr.appendChild(td_comments);
+            var realexpire = new Date(req["availibility"][i]["expire"]);
+            if (req["status"] != "CLOSED" && realexpire >= new Date()){
+                var button = document.createElement("button");
+                button.setAttribute("class", "btn btn-primary");
+                button.setAttribute("onclick", `addOnRoute(${req["availibility"][i]["id"]})`);
+                button.setAttribute("onclick", "window.location.href='/pick/?req_id="+req_id+"&ma_id="+req["availibility"][i]["ma_id"]+"&item="+req["availibility"][i]["item"]+"'");
+                button.innerHTML = "Select";
+                td_button.appendChild(button);
+            } else {
+                var button = document.createElement("button");
+                button.setAttribute("class", "btn btn-outline-danger");
+                button.innerHTML = req["status"] != "CLOSED" ? "Expired" : "Closed";
+                td_button.appendChild(button);
+            }
+
             tr.appendChild(td_button);
+            if (realexpire < new Date()){
+                tr.setAttribute("class", "table-danger");
+            }
             document.getElementById("availibility-table").appendChild(tr);
         }
 
@@ -211,11 +230,6 @@
             var td_geoloc = document.createElement("td");
             var td_comments = document.createElement("td");
             var td_button = document.createElement("td");
-            var button = document.createElement("button");
-            button.setAttribute("class", "btn btn-primary");
-            button.setAttribute("onclick", "window.location.href='/arrived/?req_id="+req_id+"&ma_id="+req["onroute"][i]["ma_id"]+"'");
-            button.innerHTML = "Arrived";
-            td_button.appendChild(button);
             td_id.innerHTML = req["onroute"][i]["ma_id"];
             td_item.innerHTML = `${req["onroute"][i]["item"]}(${req["onroute"][i]["amount"]})`;
             td_supplier.innerHTML = req["onroute"][i]["supplier"];
@@ -228,7 +242,25 @@
             tr.appendChild(td_expire);
             tr.appendChild(td_geoloc);
             tr.appendChild(td_comments);
+
+            var realexpire = new Date(req["onroute"][i]["expire"]);
+            if (req["status"] != "CLOSED" && realexpire >= new Date()){
+                var button = document.createElement("button");
+                button.setAttribute("class", "btn btn-success");
+                button.setAttribute("onclick", "window.location.href='/arrived/?req_id="+req_id+"&ma_id="+req["onroute"][i]["ma_id"]+"'");
+                button.innerHTML = "Arrive";
+                td_button.appendChild(button);
+            }else{
+                var button = document.createElement("button");
+                button.setAttribute("class", "btn btn-outline-danger");
+                button.innerHTML = req["status"] != "CLOSED" ? "Expired" : "Closed";
+                td_button.appendChild(button);
+            }
             tr.appendChild(td_button);
+
+            if (realexpire < new Date()){
+                tr.setAttribute("class", "table-danger");
+            }
             document.getElementById("onroute-table").appendChild(tr);
         }
 
