@@ -223,21 +223,45 @@ def mark_available(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = MarkAvailableForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post'})
+    req_id = ""
+    if request.method == 'GET':
+        try:
+            req_id = request.GET.dict()['req_id']
+        except:
+            pass
+    return render(request, 'form_page.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post', 'req_id': req_id})
 
 
 def pick(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = PickForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Pick', 'action': 'pick_post'})
+    req_id = ""
+    ma_id = ""
+    item = ""
+    if request.method == 'GET':
+        try:
+            req_id = request.GET.dict()['req_id']
+            ma_id = request.GET.dict()['ma_id']
+            item = request.GET.dict()['item']
+        except:
+            pass
+    return render(request, 'form_page.html', {'form': form, 'title': 'Pick', 'action': 'pick_post', 'req_id': req_id, 'ma_id': ma_id, 'pickitem': item})
 
 
 def arrived(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = ArrivedForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Arrived', 'action': 'arrived_post'})
+    req_id = ""
+    ma_id = ""
+    if request.method == 'GET':
+        try:
+            req_id = request.GET.dict()['req_id']
+            ma_id = request.GET.dict()['ma_id']
+        except:
+            pass
+    return render(request, 'form_page.html', {'form': form, 'title': 'Arrived', 'action': 'arrived_post', 'req_id': req_id, 'ma_id': ma_id})
 
 #################################
 #  POST PAGES
@@ -339,7 +363,7 @@ def get_request_post(request):
     elif request.method == 'GET':
         get_txt = request.session.get('token') + " get_request " + request.GET.dict()['id']
         received = socket_service(get_txt, test_socket)
-        return render(request, 'campaign/request_info.html', {'result': received})
+        return render(request, 'campaign/request_info.html', {'result': received, 'req_id': request.GET.dict()['id']})
     return render(request, 'result.html', {'result': "Invalid request"})
 
 

@@ -26,7 +26,22 @@
                 </div>
             </div>
         </div>
-        <script>
+        <script data-reqid="{{req_id}}" data-maid="{{ma_id}}" data-pickitem="{{pickitem}}">
+            var reqid = document.currentScript.getAttribute('data-reqid');
+            var maid = document.currentScript.getAttribute('data-maid');
+            var pickitem = document.currentScript.getAttribute('data-pickitem');
+            if (reqid != ""){
+                document.getElementById("id_request").value = reqid;
+                document.getElementById("id_request").setAttribute("readonly", true);
+            }
+            if (maid != ""){
+                document.getElementById("id_markavailable").value = maid;
+                document.getElementById("id_markavailable").setAttribute("readonly", true);
+            }
+            if (pickitem != ""){
+                document.getElementById("id_item").value = pickitem;
+                document.getElementById("id_item").setAttribute("readonly", true);
+            }
             document.querySelectorAll("input").forEach(e => e.classList.add("form-control"))
             document.querySelectorAll("textarea").forEach(e => e.classList.add("form-control"))
             document.querySelectorAll("select").forEach(e => e.classList.add("form-control"))

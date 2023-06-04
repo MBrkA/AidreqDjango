@@ -17,9 +17,9 @@
     </nav>
     <div class="container mt-3">
         <div class="row">
-            <div class="col-md-8" id="req">
+            <div class="col-md-6" id="req">
                 <div class="card">
-                    <h5 class="card-header">Request Info</h5>
+                    <h5 class="card-header bg-info">Request Info</h5>
                     <div class="card-body">
                         <table class="table" >
                             <tbody>
@@ -50,6 +50,7 @@
                                     <td colspan="2">
                                         <button class="btn btn-secondary" data-toggle="collapse" data-target="#collapseItem" role="button">Raw Data</button>
                                         <div id="collapseItem" class="collapse" style="margin-top: 5px;"></div>
+                                        <button class="btn btn-primary" onclick="addMarkAvailable()" role="button">Mark Available</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -60,15 +61,74 @@
                   
             </div>
             
-            <div class="col-md-4" id="col-map">
-                <div id="map" style="width: 600px; height: 400px;"></div>
+            <div class="col-md-6" id="col-map">
+                <div class="card">
+                    <h5 class="card-header bg-info"></h5>
+                    <div class="card-body">
+                        <div id="map" style="height: 400px;"></div>
+                    </div>
+                </div>
             </div>
-          </div>        
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info" style="text-align: center;">
+                        <h5>Available Supplies</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table" >
+                            <thead>
+                                <tr>
+                                    <th scope="col">Id</th>
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Expire</th>
+                                    <th scope="col">Geoloc</th>
+                                    <th scope="col">Comments</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="availibility-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info" style="text-align: center;">
+                        <h5>On Route</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table" >
+                            <thead>
+                                <tr>
+                                    <th scope="col">Id</th>
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Expire</th>
+                                    <th scope="col">Geoloc</th>
+                                    <th scope="col">Comments</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="onroute-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>          
     </div>
-    <script data-req="{{result}}">
+    <script data-req="{{result}}" data-id="{{req_id}}">
 
         var req = document.currentScript.getAttribute('data-req');
-
+        var req_id = document.currentScript.getAttribute('data-id');
+        
         if (req != ""){
             req = JSON.parse(req.replaceAll('\'','')); 
         }
@@ -111,6 +171,66 @@
         for (var i = 0; i < req["items"].length; i++){
             document.getElementById("ul-items").innerHTML += `<li>${req["items"][i]["item"]["name"]} (${req["items"][i]["amount"]})</li>`;
         }
+        for (var i = 0; i < req["availibility"].length; i++){
+            var tr = document.createElement("tr");
+            var td_id = document.createElement("td");
+            var td_item = document.createElement("td");
+            var td_supplier = document.createElement("td");
+            var td_expire = document.createElement("td");
+            var td_geoloc = document.createElement("td");
+            var td_comments = document.createElement("td");
+            var td_button = document.createElement("td");
+            var button = document.createElement("button");
+            button.setAttribute("class", "btn btn-primary");
+            button.setAttribute("onclick", `addOnRoute(${req["availibility"][i]["id"]})`);
+            button.setAttribute("onclick", "window.location.href='/pick/?req_id="+req_id+"&ma_id="+req["availibility"][i]["ma_id"]+"&item="+req["availibility"][i]["item"]+"'");
+            button.innerHTML = "Select";
+            td_button.appendChild(button);
+            td_id.innerHTML = req["availibility"][i]["ma_id"];
+            td_item.innerHTML = `${req["availibility"][i]["item"]}(${req["availibility"][i]["amount"]})`;
+            td_supplier.innerHTML = req["availibility"][i]["supplier"];
+            td_expire.innerHTML = req["availibility"][i]["expire"];
+            td_geoloc.innerHTML = req["availibility"][i]["geoloc"];
+            td_comments.innerHTML = req["availibility"][i]["comments"];
+            tr.appendChild(td_id);
+            tr.appendChild(td_item);
+            tr.appendChild(td_supplier);
+            tr.appendChild(td_expire);
+            tr.appendChild(td_geoloc);
+            tr.appendChild(td_comments);
+            tr.appendChild(td_button);
+            document.getElementById("availibility-table").appendChild(tr);
+        }
+
+        for (var i = 0; i < req["onroute"].length; i++){
+            var tr = document.createElement("tr");
+            var td_id = document.createElement("td");
+            var td_item = document.createElement("td");
+            var td_supplier = document.createElement("td");
+            var td_expire = document.createElement("td");
+            var td_geoloc = document.createElement("td");
+            var td_comments = document.createElement("td");
+            var td_button = document.createElement("td");
+            var button = document.createElement("button");
+            button.setAttribute("class", "btn btn-primary");
+            button.setAttribute("onclick", "window.location.href='/arrived/?req_id="+req_id+"&ma_id="+req["onroute"][i]["ma_id"]+"'");
+            button.innerHTML = "Arrived";
+            td_button.appendChild(button);
+            td_id.innerHTML = req["onroute"][i]["ma_id"];
+            td_item.innerHTML = `${req["onroute"][i]["item"]}(${req["onroute"][i]["amount"]})`;
+            td_supplier.innerHTML = req["onroute"][i]["supplier"];
+            td_expire.innerHTML = req["onroute"][i]["expire"];
+            td_geoloc.innerHTML = req["onroute"][i]["geoloc"];
+            td_comments.innerHTML = req["onroute"][i]["comments"];
+            tr.appendChild(td_id);
+            tr.appendChild(td_item);
+            tr.appendChild(td_supplier);
+            tr.appendChild(td_expire);
+            tr.appendChild(td_geoloc);
+            tr.appendChild(td_comments);
+            tr.appendChild(td_button);
+            document.getElementById("onroute-table").appendChild(tr);
+        }
 
 
         const map = L.map('map').setView([req["geoloc"][1], req["geoloc"][0]], 13);
@@ -120,7 +240,10 @@
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
-    
+        
+        function addMarkAvailable(){
+            window.location.href = "/mark_available/?req_id="+req_id;
+        }
     </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
