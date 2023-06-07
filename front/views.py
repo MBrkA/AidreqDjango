@@ -38,6 +38,12 @@ def login(request):
     form = LoginForm()
     return render(request, 'login.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
 
+def register(request):
+    if request.session.get('token', False):
+        return redirect('/home')
+    form = RegisterForm()
+    return render(request, "login.html", {'form': form, 'title': 'Register', 'action': 'register_post'})
+
 
 def logout(request):
     received = socket_service(f"{request.session.get('token')} logout", test_socket)
@@ -65,6 +71,21 @@ def login_post(request):
             return render(request, 'login.html', {'form': form, 'error': 'Invalid username or password!', 'title': 'Login', 'action': 'login_post'})
     else:
         return render(request, 'login.html', {'form': form, 'error': 'Encountered an error!' ,'title': 'Login', 'action': 'login_post'})
+
+def register_post(request):
+    if request.session.get('token', False):
+        return redirect('/home')
+    form = RegisterForm(request.POST)
+    if form.is_valid():
+        register_txt = "register " + form.cleaned_data["username"] + " " + form.cleaned_data["password"] + " " + form.cleaned_data["name"] + " " + form.cleaned_data["email"]
+        received = socket_service(register_txt, test_socket)
+        if "Register successful" in received:
+            # REGISTER SUCCESSFUL
+            return redirect('/login')
+        else:
+            return render(request, 'login.html', {'form': form, 'error': 'Failed to create user', 'title': 'Register', 'action': 'register_post'})
+    
+    pass
 
 #################################
 #  FORM PAGES

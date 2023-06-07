@@ -6,6 +6,13 @@ class LoginForm(forms.Form):
     username = forms.CharField(label='Username', max_length=64, required=True)
     password = forms.CharField(label='Password', widget=forms.PasswordInput(), required=True)
 
+# REGISTER FORM
+class RegisterForm(forms.Form):
+    username = forms.CharField(label="Username", max_length=64, required=True)
+    name = forms.CharField(label="Name", max_length=64, required=True)
+    email = forms.CharField(label="Email", max_length=64, widget=forms.EmailInput(), required=True)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput(), required=True)
+
 
 # ITEMS FORMS
 class SearchItemForm(forms.Form):
