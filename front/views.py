@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from front.forms import *
-from front.socket import DjangoSocket, socket_service, get_watches
+from front.socket import DjangoSocket, socket_service, get_watches, all_watches
 
 import threading
 
@@ -27,7 +27,8 @@ def home(request):
         return redirect('/login')
     campaign = request.session.get("campaign", False)
     username = request.session.get("username", "")
-    watches = get_watches(request.session.get('token'))
+    #watches = get_watches(request.session.get('token'))
+    watches = all_watches()
     if watches == []:
         watches = ""
     return render(request, 'home.html', {'campaign': campaign, 'username': username, 'watches': watches})

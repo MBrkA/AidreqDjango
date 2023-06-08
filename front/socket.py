@@ -20,13 +20,13 @@ def get_response(client_socket,recv_q, condition):
     while True:
         response = client_socket.recv(1024).decode()
         eof_check = True if response.find("##EOF##") != -1 else False
-        watch_check = True if response.find("WATCH MATCHED") != -1 else False
+        watch_check = True if response.find("watchcalled") != -1 else False
         if eof_check:
             response = response.replace("##EOF##", "")
         resp = re.search("##EOF##", response)
         if watch_check:
             global watches
-            watches.append({'token': response.split()[-1], 'response': response})
+            watches.append(response)
             continue
         if response:
             print("THREAD: response received")
@@ -78,3 +78,7 @@ def get_watches(token):
         if watch['token'] == token:
             result.append(watch['response'])
     return result
+
+def all_watches():
+    global watches
+    return watches
