@@ -1,13 +1,6 @@
-<html lang="en">
-    <head><meta charset="utf-8">
-        <title>Result</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    </head>
-    <body>
-        <nav class="navbar navbar-light" style="background-color: powderblue;">
-            <a class="navbar-brand"  href="/">Home</a>
-            <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
-        </nav>
+
+{% extends "base.html" %}
+{% block content %}
 
         <div class="container container-fluid mt-3">
             <div class="row">
@@ -44,5 +37,4 @@
             document.getElementById("name").innerHTML = data.name
             document.getElementById("synonyms").innerHTML = data.synonyms
         </script>
-    </body>
-</html>
+{%endblock%}

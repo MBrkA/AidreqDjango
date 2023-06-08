@@ -97,7 +97,7 @@ def create_campaign(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = CreateCampaignForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Create Campaign', 'action': 'create_campaign_post'})
+    return render(request, 'form/form_page.html', {'form': form, 'title': 'Create Campaign', 'action': 'create_campaign_post'})
 
 
 def list_campaigns(request):
@@ -136,21 +136,21 @@ def search_item(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = SearchItemForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Search Item', 'action': 'search_item_post'})
+    return render(request, 'form/form_page.html', {'form': form, 'title': 'Search Item', 'action': 'search_item_post'})
 
 
 def update_item(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = UpdateItemForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Update Item', 'action': 'update_item_post'})
+    return render(request, 'form/form_page.html', {'form': form, 'title': 'Update Item', 'action': 'update_item_post'})
 
 
 def delete_item(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = RemoveItemForm()
-    return render(request, 'form_page.html', {'form': form, 'title': 'Delete Item', 'action': 'delete_item_post'})
+    return render(request, 'form/form_page.html', {'form': form, 'title': 'Delete Item', 'action': 'delete_item_post'})
 
 
 # CAMPAIGN OPERATIONS FORM PAGES
@@ -205,28 +205,28 @@ def query_rect(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = QueryRectForm()
-    return render(request, 'form_page_item.html', {'form': form, 'title': 'Query Rectangular', 'action': 'query_rect_post'})
+    return render(request, 'form/form_page_item.html', {'form': form, 'title': 'Query Rectangular', 'action': 'query_rect_post'})
 
 
 def query_circle(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = QueryCircleForm()
-    return render(request, 'form_page_item.html', {'form': form, 'title': 'Query Circle', 'action': 'query_circle_post'})
+    return render(request, 'form/form_page_item.html', {'form': form, 'title': 'Query Circle', 'action': 'query_circle_post'})
 
 
 def watch_rect(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = WatchRectForm()
-    return render(request, 'form_page_item.html', {'form': form, 'title': 'Watch Rectangular', 'action': 'watch_rect_post'})
+    return render(request, 'form/form_page_item.html', {'form': form, 'title': 'Watch Rectangular', 'action': 'watch_rect_post'})
 
 
 def watch_circle(request):
     if not request.session.get('token', False):
         return redirect('/login')
     form = WatchCircleForm()
-    return render(request, 'form_page_item.html', {'form': form, 'title': 'Watch Circle', 'action': 'watch_circle_post'})
+    return render(request, 'form/form_page_item.html', {'form': form, 'title': 'Watch Circle', 'action': 'watch_circle_post'})
 
 
 def unwatch(request):
@@ -250,7 +250,7 @@ def mark_available(request):
             req_id = request.GET.dict()['req_id']
         except:
             pass
-    return render(request, 'form_page.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post', 'req_id': req_id})
+    return render(request, 'form/form_page.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post', 'req_id': req_id})
 
 
 def pick(request):
@@ -267,7 +267,7 @@ def pick(request):
             item = request.GET.dict()['item']
         except:
             pass
-    return render(request, 'form_page.html', {'form': form, 'title': 'Pick', 'action': 'pick_post', 'req_id': req_id, 'ma_id': ma_id, 'pickitem': item})
+    return render(request, 'form/form_page.html', {'form': form, 'title': 'Pick', 'action': 'pick_post', 'req_id': req_id, 'ma_id': ma_id, 'pickitem': item})
 
 
 def arrived(request):
@@ -282,7 +282,7 @@ def arrived(request):
             ma_id = request.GET.dict()['ma_id']
         except:
             pass
-    return render(request, 'form_page.html', {'form': form, 'title': 'Arrived', 'action': 'arrived_post', 'req_id': req_id, 'ma_id': ma_id})
+    return render(request, 'form/form_page.html', {'form': form, 'title': 'Arrived', 'action': 'arrived_post', 'req_id': req_id, 'ma_id': ma_id})
 
 #################################
 #  POST PAGES
