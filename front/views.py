@@ -98,7 +98,7 @@ def register_post(request):
             # REGISTER SUCCESSFUL
             return render(request,'login/register_succ.html')
         else:
-            return render(request, 'login/login.html', {'form': form, 'error': 'Failed to create user', 'title': 'Register', 'action': 'register_post'})
+            return render(request, 'login/login.html', {'form': form, 'error': 'Registration failed!', 'title': 'Register', 'action': 'register_post'})
     
     pass
 
