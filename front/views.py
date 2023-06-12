@@ -51,13 +51,13 @@ def login(request):
     if request.session.get('token', False):
         return redirect('/home')
     form = LoginForm()
-    return render(request, 'login.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
+    return render(request, 'login/login.html', {'form': form, 'title': 'Login', 'action': 'login_post'})
 
 def register(request):
     if request.session.get('token', False):
         return redirect('/home')
     form = RegisterForm()
-    return render(request, "login.html", {'form': form, 'title': 'Register', 'action': 'register_post'})
+    return render(request, "login/login.html", {'form': form, 'title': 'Register', 'action': 'register_post'})
 
 
 def logout(request):
@@ -83,9 +83,9 @@ def login_post(request):
             request.session['username'] = form.cleaned_data["username"]
             return redirect('/home', {'campaign': False, 'username': form.cleaned_data["username"]})
         else:
-            return render(request, 'login.html', {'form': form, 'error': 'Invalid username or password!', 'title': 'Login', 'action': 'login_post'})
+            return render(request, 'login/login.html', {'form': form, 'error': 'Invalid username or password!', 'title': 'Login', 'action': 'login_post'})
     else:
-        return render(request, 'login.html', {'form': form, 'error': 'Encountered an error!' ,'title': 'Login', 'action': 'login_post'})
+        return render(request, 'login/login.html', {'form': form, 'error': 'Encountered an error!' ,'title': 'Login', 'action': 'login_post'})
 
 def register_post(request):
     if request.session.get('token', False):
@@ -96,9 +96,9 @@ def register_post(request):
         received = socket_service(register_txt, test_socket)
         if "Register successful" in received:
             # REGISTER SUCCESSFUL
-            return redirect('/login')
+            return render(request,'login/register_succ.html')
         else:
-            return render(request, 'login.html', {'form': form, 'error': 'Failed to create user', 'title': 'Register', 'action': 'register_post'})
+            return render(request, 'login/login.html', {'form': form, 'error': 'Failed to create user', 'title': 'Register', 'action': 'register_post'})
     
     pass
 
@@ -134,7 +134,7 @@ def open_campaign(request):
     if "##EOF##" in received:
         received = received.replace("##EOF##", "")
     campaigns = received.split("\t")
-    if "[]" in campaigns:
+    if "[]" in received:
         return render(request, 'result.html', {'result': 'No campaigns to open'})
     return render(request, 'main/open_campaign.html', {'form': form, 'title': 'Open Campaign', 'action': 'open_campaign_post', 'result': campaigns})
 
