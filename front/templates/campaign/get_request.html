@@ -2,8 +2,8 @@
 {% extends "base.html" %}
 {% block content %}
         <div class="container mt-3">
-            <div class="card">
-                <h5 class="card-header">{{title}}</h5>
+            <div class="card text-white bg-dark">
+                <h5 class="card-header bg-info">{{title}}</h5>
                 <div class="card-body">
                     <form method="post" action="/{{action}}/">
                         {% csrf_token %}

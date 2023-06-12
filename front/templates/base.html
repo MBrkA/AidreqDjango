@@ -15,9 +15,12 @@
         <script src="https://cdn.jsdelivr.net/npm/simple-notify@0.5.5/dist/simple-notify.min.js"></script>
     </head>
     <body>
-    <nav class="navbar navbar-secondary" style="background-color: powderblue;">
-        <a class="navbar-brand"  href="/home">Home</a>
-        <a class="nav-item nav-link" style="text-align: right" href="/logout">Logout</a>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/home">
+            <img src="https://tanitim.ceng.metu.edu.tr/images/ceng_400x400.png" width="30" height="30" class="d-inline-block align-top" alt="">
+            Aid Delivery System
+          </a>
+        <a class="btn btn-outline-info my-2 my-sm-0" style="text-align: right" href="/logout">Logout</a>
     </nav>
 {% block content %}{% endblock %}
 <script data-token="{{request.session.token}}" data-watches="{{watches}}">

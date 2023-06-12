@@ -4,9 +4,9 @@
         <div class="container container-fluid mt-3">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h1>{{title}}</h1>
+                    <div class="card text-white bg-dark mb-3">
+                        <div class="card-header bg-info">
+                            <h3>{{title}}</h3>
                         </div>
                         <div class="card-body">
                             <form method="post" action="/{{action}}/" id="form">
@@ -36,7 +36,7 @@ function add_item() {
     item.setAttribute("id", "item" + item_count);
     item.setAttribute("placeholder", "Item " + item_count);
     item.setAttribute("required", "true");
-    item.setAttribute("class", "form-control");
+    item.setAttribute("class", "form-control mb-1");
 
     document.getElementById("item_count").before(item)
     document.getElementById("item_count").setAttribute("value", item_count);

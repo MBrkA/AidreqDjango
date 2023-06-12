@@ -31,7 +31,21 @@ def home(request):
     watches = all_watches()
     if watches == []:
         watches = ""
-    return render(request, 'home.html', {'campaign': campaign, 'username': username, 'watches': watches})
+    # GET REQUEST DATA FOR MAP
+    map_data = ""
+    if campaign:
+        map_loc = [39.89178919874682, 32.78354912996293] 
+        query_txt = f"{request.session.get('token')} homequery {map_loc[0]-0.025} {map_loc[1]-0.025} {map_loc[0]+0.025} {map_loc[1]+0.025}"
+        map_data = socket_service(query_txt, test_socket)
+        if "No requests found" in map_data:
+            map_data = ""
+        else:
+            map_data = map_data.split("\n")
+            map_data.pop()
+            map_data = '{"data": [' + ",".join(map_data) + '] }'
+
+    # RENDER
+    return render(request, 'home.html', {'campaign': campaign, 'username': username, 'watches': watches, 'map_data': map_data})
 
 def login(request):
     if request.session.get('token', False):
@@ -120,6 +134,8 @@ def open_campaign(request):
     if "##EOF##" in received:
         received = received.replace("##EOF##", "")
     campaigns = received.split("\t")
+    if "[]" in campaigns:
+        return render(request, 'result.html', {'result': 'No campaigns to open'})
     return render(request, 'main/open_campaign.html', {'form': form, 'title': 'Open Campaign', 'action': 'open_campaign_post', 'result': campaigns})
 
 
@@ -251,7 +267,7 @@ def mark_available(request):
             req_id = request.GET.dict()['req_id']
         except:
             pass
-    return render(request, 'form/form_page.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post', 'req_id': req_id})
+    return render(request, 'campaign/mark_available.html', {'form': form, 'title': 'Mark Available', 'action': 'mark_available_post', 'req_id': req_id})
 
 
 def pick(request):

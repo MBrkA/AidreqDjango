@@ -4,10 +4,10 @@
     <div class="container mt-3">
         <div class="row">
             <div class="col-md-6" id="req">
-                <div class="card">
+                <div class="card text-white bg-dark" style="height: 100%;">
                     <h5 class="card-header bg-info">Request Info</h5>
                     <div class="card-body">
-                        <table class="table" >
+                        <table class="table text-white" >
                             <tbody>
                                 <tr>
                                     <td>Owner</td>
@@ -47,7 +47,7 @@
             </div>
             
             <div class="col-md-6" id="col-map">
-                <div class="card">
+                <div class="card text-white bg-dark">
                     <h5 class="card-header bg-info"></h5>
                     <div class="card-body">
                         <div id="map" style="height: 400px;"></div>
@@ -57,12 +57,12 @@
         </div>
         <div class="row mt-3">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card text-white bg-dark">
                     <div class="card-header bg-info" style="text-align: center;">
                         <h5>Available Supplies</h5>
                     </div>
                     <div class="card-body">
-                        <table class="table" >
+                        <table class="table text-white" >
                             <thead>
                                 <tr>
                                     <th scope="col">Id</th>
@@ -84,12 +84,12 @@
         
         <div class="row mt-3">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card text-white bg-dark">
                     <div class="card-header bg-info" style="text-align: center;">
                         <h5>On Route</h5>
                     </div>
                     <div class="card-body">
-                        <table class="table" >
+                        <table class="table text-white" >
                             <thead>
                                 <tr>
                                     <th scope="col">Id</th>
@@ -250,17 +250,49 @@
             document.getElementById("onroute-table").appendChild(tr);
         }
 
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+
+        var violetIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
 
         const map = L.map('map').setView([req["geoloc"][1], req["geoloc"][0]], 13);
-        var marker = L.marker([req["geoloc"][1], req["geoloc"][0]]).addTo(map);
+        var marker = L.marker([req["geoloc"][1], req["geoloc"][0]]).addTo(map).bindPopup('Request Location');
     
         const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
         
+        req.availibility.forEach((e) => {
+            L.marker([e["geoloc"][1], e["geoloc"][0]],{icon: greenIcon}).addTo(map).bindPopup('Supplier: '+e.supplier);
+        })
+
+        req.onroute.forEach((e) => {
+            L.marker([e["geoloc"][1], e["geoloc"][0]],{icon: violetIcon}).addTo(map).bindPopup('Onroute: '+e.supplier);
+        })
+
+
         function addMarkAvailable(){
             window.location.href = "/mark_available/?req_id="+req_id;
         }
     </script>
 {%endblock%}
+
+latitude1= 39.91737289576941
+longitude1= 32.732563018798835
+latitude2= 39.86785113379605
+longitude2 = 32.83264160156251
