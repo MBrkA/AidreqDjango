@@ -222,8 +222,8 @@
 
         if (map_data != "") {
             map_data = JSON.parse(map_data.replaceAll("\'",""));
-            map_data.data   .forEach(function (item) {
-                var marker = L.marker([item.geoloc[1],item.geoloc[0]]).addTo(map);
+            map_data.data.forEach(function (item) {
+                var marker = L.marker([item[1],item[0]]).addTo(map);
                 marker.bindPopup("Request location");
             });
         }
