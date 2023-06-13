@@ -34,7 +34,7 @@ def home(request):
     # GET REQUEST DATA FOR MAP
     map_data = ""
     if campaign:
-        map_loc = [39.89178919874682, 32.78354912996293] 
+        map_loc = [32.78354912996293,39.89178919874682] 
         query_txt = f"{request.session.get('token')} homequery {map_loc[0]-0.025} {map_loc[1]-0.025} {map_loc[0]+0.025} {map_loc[1]+0.025}"
         map_data = socket_service(query_txt, test_socket)
         if "No requests found" in map_data:
@@ -443,6 +443,7 @@ def query_rect_post(request):
                 item += data[f"item{i+1}"] + " "
             query_txt = f"{request.session.get('token')} query {data['item_count']}{item}0 {form.cleaned_data['latitude1']} {form.cleaned_data['longitude1']} {form.cleaned_data['latitude2']} {form.cleaned_data['longitude2']} {form.cleaned_data['urgency']}"
             received = socket_service(query_txt, test_socket)
+            received = received.replace("\n", "<br>")
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})
@@ -459,6 +460,7 @@ def query_circle_post(request):
                 item += data[f"item{i+1}"] + " "
             query_txt = f"{request.session.get('token')} query {data['item_count']}{item}1 {form.cleaned_data['latitude']} {form.cleaned_data['longitude']} {form.cleaned_data['radius']} {form.cleaned_data['urgency']}"
             received = socket_service(query_txt, test_socket)
+            received = received.replace("\n", "<br>")
             return render(request, 'result.html', {'result': received})
         else:
             return render(request, 'result.html', {'result': "Invalid form"})

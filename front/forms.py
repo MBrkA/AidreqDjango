@@ -104,7 +104,7 @@ class UnwatchForm(forms.Form):
 class MarkAvailableForm(forms.Form):
     request = forms.CharField(label='Requestid', max_length=64, required=True)
     item = forms.CharField(label='Item', max_length=64, required=True)
-    amount = forms.IntegerField(label='Amount', required=True)
+    amount = forms.IntegerField(label='Amount', required=True, min_value=1)
     expire = forms.IntegerField(label='Expire(hours)', required=True)
     latitude = forms.FloatField(label='Latitude', required=True)
     longitude = forms.FloatField(label='Longitude', required=True)
@@ -115,7 +115,7 @@ class PickForm(forms.Form):
     request = forms.CharField(label='RequestId', max_length=64, required=True)
     markavailable = forms.CharField(label='MarkavailableId', max_length=64, required=True)
     item = forms.CharField(label='Item', max_length=64, required=True)
-    amount = forms.IntegerField(label='Amount', required=True)
+    amount = forms.IntegerField(label='Amount', required=True, min_value=1)
 
 
 class ArrivedForm(forms.Form):

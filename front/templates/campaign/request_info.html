@@ -269,8 +269,8 @@
             shadowSize: [41, 41]
         });
 
-        const map = L.map('map').setView([req["geoloc"][1], req["geoloc"][0]], 13);
-        var marker = L.marker([req["geoloc"][1], req["geoloc"][0]]).addTo(map).bindPopup('Request Location');
+        const map = L.map('map').setView([req["geoloc"][0], req["geoloc"][1]], 13);
+        var marker = L.marker([req["geoloc"][0], req["geoloc"][1]]).addTo(map).bindPopup('Request Location');
     
         const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -278,11 +278,11 @@
         }).addTo(map);
         
         req.availibility.forEach((e) => {
-            L.marker([e["geoloc"][1], e["geoloc"][0]],{icon: greenIcon}).addTo(map).bindPopup('Supplier: '+e.supplier);
+            L.marker([e["geoloc"][0], e["geoloc"][1]],{icon: greenIcon}).addTo(map).bindPopup('Supplier: '+e.supplier);
         })
 
         req.onroute.forEach((e) => {
-            L.marker([e["geoloc"][1], e["geoloc"][0]],{icon: violetIcon}).addTo(map).bindPopup('Onroute: '+e.supplier);
+            L.marker([e["geoloc"][0], e["geoloc"][1]],{icon: violetIcon}).addTo(map).bindPopup('Onroute: '+e.supplier);
         })
 
 
