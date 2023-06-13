@@ -23,28 +23,57 @@
         <a class="btn btn-outline-info my-2 my-sm-0" style="text-align: right" href="/logout">Logout</a>
     </nav>
 {% block content %}{% endblock %}
-<script data-token="{{request.session.token}}" data-watches="{{watches}}">
+<script data-token="{{request.session.token}}">
     var token = document.currentScript.getAttribute('data-token');
     function pushNotify(data) {
         myNotify = new Notify({
-            status: 'warning',
-            title: 'Watch Called',
-            text: `Request: ${data.request}`,
+            status: data.type,
+            title: data.type == 'success' ? 'Watch Called' : 'Notification',
+            text: `${data.request}`,
             effect: 'slide',
-            type: 2
+            type: 2,
+            autoclose: data.type == 'success' ? false : true,
         })
     }
 
-    var watches = document.currentScript.getAttribute('data-watches');
-    watches = watches.replaceAll("\'","");
-    try{
-        watches = JSON.parse(watches)
-        watches.forEach(element => {
-            if (element.token == token){
-                pushNotify(element)
+    class Ws {
+        constructor(ipport){
+            this.socket = undefined;
+            this.ipport = ipport;
+            this.createwebsocket();
+        }
+        createwebsocket() {
+            if (this.socket) {
+                this.socket.close();
             }
-        });           
-    } catch {}
+            var socket = new WebSocket('ws://' + this.ipport);
+            socket.onopen = function() {
+                console.log('Connection established');
+			}
+			socket.onerror = function() {
+                console.log('Connection error');
+			}
+			socket.onclose = function() {
+                console.log('Connection closed');
+				ws.socket = undefined;
+				setTimeout(() => { 
+					if (! ws.socket ) {
+						ws.createwebsocket();
+					} }, 5000);
+			}
+            socket.onmessage = function wseventhandler (event) {
+                var data = JSON.parse(event.data)
+                if (data.token == token){
+                    pushNotify({type: 'success',request: data.request});
+
+                }
+			}
+			this.socket = socket
+        }
+    }
+
+    window.onload = () => {ws = new Ws('127.0.0.1:1999')}
+    window.onbeforeunload = () => {ws.socket.close()}
 
 </script>
 
