@@ -401,7 +401,7 @@ def get_request_post(request):
     elif request.method == 'GET':
         get_txt = request.session.get('token') + " get_request " + request.GET.dict()['id']
         received = socket_service(get_txt, test_socket)
-        return render(request, 'campaign/request_info.html', {'result': received, 'req_id': request.GET.dict()['id']})
+        return render(request, 'campaign/request_info.html', {'result': received, 'req_id': request.GET.dict()['id'], 'token': request.session.get('token')})
     return render(request, 'result.html', {'result': "Invalid request"})
 
 

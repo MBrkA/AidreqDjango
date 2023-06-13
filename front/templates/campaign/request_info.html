@@ -62,21 +62,23 @@
                         <h5>Available Supplies</h5>
                     </div>
                     <div class="card-body">
-                        <table class="table text-white" >
-                            <thead>
-                                <tr>
-                                    <th scope="col">Id</th>
-                                    <th scope="col">Item</th>
-                                    <th scope="col">Supplier</th>
-                                    <th scope="col">Expire</th>
-                                    <th scope="col">Geoloc</th>
-                                    <th scope="col">Comments</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="availibility-table">
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table text-white" >
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Item</th>
+                                        <th scope="col">Supplier</th>
+                                        <th scope="col">Expire</th>
+                                        <th scope="col">Geoloc</th>
+                                        <th scope="col">Comments</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="availibility-table">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,30 +91,33 @@
                         <h5>On Route</h5>
                     </div>
                     <div class="card-body">
-                        <table class="table text-white" >
-                            <thead>
-                                <tr>
-                                    <th scope="col">Id</th>
-                                    <th scope="col">Item</th>
-                                    <th scope="col">Supplier</th>
-                                    <th scope="col">Expire</th>
-                                    <th scope="col">Geoloc</th>
-                                    <th scope="col">Comments</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="onroute-table">
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table text-white" >
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Item</th>
+                                        <th scope="col">Supplier</th>
+                                        <th scope="col">Expire</th>
+                                        <th scope="col">Geoloc</th>
+                                        <th scope="col">Comments</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="onroute-table">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>          
     </div>
-    <script data-req="{{result}}" data-id="{{req_id}}">
+    <script data-req="{{result}}" data-id="{{req_id}}" data-token="{{token}}">
 
         var req = document.currentScript.getAttribute('data-req');
         var req_id = document.currentScript.getAttribute('data-id');
+        var token = document.currentScript.getAttribute('data-token');
         
         if (req != ""){
             req = JSON.parse(req.replaceAll('\'','').replaceAll("\\","")); 
@@ -156,7 +161,7 @@
         for (var i = 0; i < req["items"].length; i++){
             document.getElementById("ul-items").innerHTML += `<li>${req["items"][i]["item"]["name"]} (${req["items"][i]["amount"]})</li>`;
         }
-        if (req["status"] != "CLOSED"){
+        if (req["status"] != "CLOSED" && !token.includes(req.owner)){
             var button = document.createElement("button");
             button.setAttribute("class", "btn btn-primary");
             button.setAttribute("onclick", "addMarkAvailable()");
@@ -186,21 +191,23 @@
             tr.appendChild(td_geoloc);
             tr.appendChild(td_comments);
             var realexpire = new Date(req["availibility"][i]["expire"]);
-            if (req["status"] != "CLOSED" && realexpire >= new Date()){
-                var button = document.createElement("button");
-                button.setAttribute("class", "btn btn-primary");
-                button.setAttribute("onclick", `addOnRoute(${req["availibility"][i]["id"]})`);
-                button.setAttribute("onclick", "window.location.href='/pick/?req_id="+req_id+"&ma_id="+req["availibility"][i]["ma_id"]+"&item="+req["availibility"][i]["item"]+"'");
-                button.innerHTML = "Select";
-                td_button.appendChild(button);
-            } else {
-                var button = document.createElement("button");
-                button.setAttribute("class", "btn btn-outline-danger");
-                button.innerHTML = req["status"] != "CLOSED" ? "Expired" : "Closed";
-                td_button.appendChild(button);
-            }
 
-            tr.appendChild(td_button);
+            if (token.includes(req.owner)){
+                if (req["status"] != "CLOSED" && realexpire >= new Date()){
+                    var button = document.createElement("button");
+                    button.setAttribute("class", "btn btn-primary");
+                    button.setAttribute("onclick", `addOnRoute(${req["availibility"][i]["id"]})`);
+                    button.setAttribute("onclick", "window.location.href='/pick/?req_id="+req_id+"&ma_id="+req["availibility"][i]["ma_id"]+"&item="+req["availibility"][i]["item"]+"'");
+                    button.innerHTML = "Select";
+                    td_button.appendChild(button);
+                } else {
+                    var button = document.createElement("button");
+                    button.setAttribute("class", "btn btn-outline-danger");
+                    button.innerHTML = req["status"] != "CLOSED" ? "Expired" : "Closed";
+                    td_button.appendChild(button);
+                }
+                tr.appendChild(td_button);
+            }
             if (realexpire < new Date()){
                 tr.setAttribute("class", "table-danger");
             }
@@ -230,19 +237,22 @@
             tr.appendChild(td_comments);
 
             var realexpire = new Date(req["onroute"][i]["expire"]);
-            if (req["status"] != "CLOSED" && realexpire >= new Date()){
-                var button = document.createElement("button");
-                button.setAttribute("class", "btn btn-success");
-                button.setAttribute("onclick", "window.location.href='/arrived/?req_id="+req_id+"&ma_id="+req["onroute"][i]["ma_id"]+"'");
-                button.innerHTML = "Arrive";
-                td_button.appendChild(button);
-            }else{
-                var button = document.createElement("button");
-                button.setAttribute("class", "btn btn-outline-danger");
-                button.innerHTML = req["status"] != "CLOSED" ? "Expired" : "Closed";
-                td_button.appendChild(button);
+
+            if (token.includes(req["onroute"][0].supplier)){
+                if (req["status"] != "CLOSED" && realexpire >= new Date()){
+                    var button = document.createElement("button");
+                    button.setAttribute("class", "btn btn-success");
+                    button.setAttribute("onclick", "window.location.href='/arrived/?req_id="+req_id+"&ma_id="+req["onroute"][i]["ma_id"]+"'");
+                    button.innerHTML = "Arrive";
+                    td_button.appendChild(button);
+                }else{
+                    var button = document.createElement("button");
+                    button.setAttribute("class", "btn btn-outline-danger");
+                    button.innerHTML = req["status"] != "CLOSED" ? "Expired" : "Closed";
+                    td_button.appendChild(button);
+                }
+                tr.appendChild(td_button);
             }
-            tr.appendChild(td_button);
 
             if (realexpire < new Date()){
                 tr.setAttribute("class", "table-danger");
