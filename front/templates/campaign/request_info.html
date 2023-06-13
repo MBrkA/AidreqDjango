@@ -115,7 +115,7 @@
         var req_id = document.currentScript.getAttribute('data-id');
         
         if (req != ""){
-            req = JSON.parse(req.replaceAll('\'','')); 
+            req = JSON.parse(req.replaceAll('\'','').replaceAll("\\","")); 
         }
 /*
 {
@@ -291,8 +291,3 @@
         }
     </script>
 {%endblock%}
-
-latitude1= 39.91737289576941
-longitude1= 32.732563018798835
-latitude2= 39.86785113379605
-longitude2 = 32.83264160156251
